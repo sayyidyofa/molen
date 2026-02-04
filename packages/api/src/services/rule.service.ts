@@ -1,4 +1,5 @@
 import { IElasticClient, ExternalClientFactory } from '@molen/core';
+import { Rule, RuleUpdate } from '../types/api.types';
 
 /**
  * Service for managing fraud detection rules
@@ -14,7 +15,7 @@ export class RuleService {
   /**
    * Get all rules
    */
-  async getRules(): Promise<any[]> {
+  async getRules(): Promise<Rule[]> {
     const result = await this.elasticClient.search({
       index: 'fraud-rules',
       body: {
@@ -25,13 +26,13 @@ export class RuleService {
     return result.hits.hits.map((hit: any) => ({
       id: hit._id,
       ...hit._source,
-    }));
+    })) as Rule[];
   }
 
   /**
    * Update a rule threshold
    */
-  async updateRule(ruleId: string, updates: any): Promise<any> {
+  async updateRule(ruleId: string, updates: RuleUpdate): Promise<Rule> {
     // In production, this would update Postgres and trigger LavinMQ broadcast
     await this.elasticClient.index({
       index: 'fraud-rules',
@@ -42,7 +43,7 @@ export class RuleService {
       },
     });
 
-    return { id: ruleId, ...updates };
+    return { id: ruleId, ...updates } as Rule;
   }
 
   /**

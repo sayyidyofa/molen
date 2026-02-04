@@ -6,7 +6,6 @@ import { IRedisClient } from './redis.interface';
 export class RealRedisClient implements IRedisClient {
   private host: string;
   private port: number;
-  private client: any; // Would use ioredis or similar in real implementation
 
   constructor(config: { host: string; port: number }) {
     this.host = config.host;
@@ -15,16 +14,16 @@ export class RealRedisClient implements IRedisClient {
     // this.client = new Redis({ host: this.host, port: this.port });
   }
 
-  async get(key: string): Promise<string | null> {
+  async get(_key: string): Promise<string | null> {
     // Placeholder for real Redis implementation
     return null;
   }
 
-  async set(key: string, value: string, expirySeconds?: number): Promise<void> {
+  async set(_key: string, _value: string, _expirySeconds?: number): Promise<void> {
     // Placeholder for real Redis implementation
   }
 
-  async incr(key: string): Promise<number> {
+  async incr(_key: string): Promise<number> {
     // Placeholder for real Redis implementation
     return 1;
   }

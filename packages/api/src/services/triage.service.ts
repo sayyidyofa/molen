@@ -1,4 +1,5 @@
 import { IElasticClient, ExternalClientFactory } from '@molen/core';
+import { TriageResult, FlaggedCase } from '../types/api.types';
 
 /**
  * Service for case triage functionality
@@ -18,7 +19,7 @@ export class TriageService {
     from?: number;
     size?: number;
     minScore?: number;
-  }): Promise<any> {
+  }): Promise<TriageResult> {
     const result = await this.elasticClient.search({
       index: 'fraud-alerts',
       body: {
@@ -43,14 +44,14 @@ export class TriageService {
       cases: result.hits.hits.map((hit: any) => ({
         id: hit._id,
         ...hit._source,
-      })),
+      })) as FlaggedCase[],
     };
   }
 
   /**
    * Get details for a specific case
    */
-  async getCaseDetails(caseId: string): Promise<any> {
+  async getCaseDetails(caseId: string): Promise<FlaggedCase> {
     const result = await this.elasticClient.search({
       index: 'fraud-alerts',
       body: {
@@ -65,6 +66,6 @@ export class TriageService {
     return {
       id: result.hits.hits[0]._id,
       ...result.hits.hits[0]._source,
-    };
+    } as FlaggedCase;
   }
 }

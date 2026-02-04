@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/api';
+import { Rule } from '../types/api.types';
 
 /**
  * Rule Editor Component (REQ-3.2)
  * Interface to update fraud detection rule thresholds
  */
 export function RuleEditor() {
-  const [rules, setRules] = useState<any[]>([]);
+  const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
 

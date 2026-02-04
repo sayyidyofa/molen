@@ -10,18 +10,18 @@ export class RealFlinkClient implements IFlinkClient {
     this.apiUrl = config.apiUrl;
   }
 
-  async submitJob(jobConfig: object): Promise<string> {
+  async submitJob(_jobConfig: object): Promise<string> {
     // Placeholder for real Flink REST API implementation
     // Would use fetch or axios to POST to Flink REST API
     return 'job-id-placeholder';
   }
 
-  async getJobStatus(jobId: string): Promise<any> {
+  async getJobStatus(_jobId: string): Promise<any> {
     // Placeholder for real Flink REST API implementation
     return { status: 'RUNNING' };
   }
 
-  async cancelJob(jobId: string): Promise<void> {
+  async cancelJob(_jobId: string): Promise<void> {
     // Placeholder for real Flink REST API implementation
   }
 

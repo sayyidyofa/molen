@@ -13,15 +13,22 @@
     "build:core": "bun --cwd packages/core run build",
     "build:api": "bun --cwd packages/api run build",
     "build:ui": "bun --cwd packages/ui run build",
+    "typecheck": "bun run typecheck:core && bun run typecheck:api && bun run typecheck:ui",
+    "typecheck:core": "bun --cwd packages/core run typecheck",
+    "typecheck:api": "bun --cwd packages/api run typecheck",
+    "typecheck:ui": "bun --cwd packages/ui run typecheck",
     "test": "bun test",
     "test:core": "bun --cwd packages/core test",
     "test:api": "bun --cwd packages/api test",
     "test:ui": "bun --cwd packages/ui test",
     "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
+    "eslint": "^8.56.0",
     "typescript": "^5.3.3"
   },
   "engines": {

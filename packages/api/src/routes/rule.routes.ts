@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia';
 import { RuleService } from '../services/rule.service';
+import { RuleUpdate } from '../types/api.types';
 
 /**
  * Routes for rule management
@@ -14,7 +15,7 @@ export function ruleRoutes(app: Elysia, ruleService: RuleService) {
       })
       .put('/:ruleId', async ({ params, body }) => {
         const { ruleId } = params;
-        const updates = body as any;
+        const updates = body as RuleUpdate;
         const rule = await ruleService.updateRule(ruleId, updates);
         return rule;
       })

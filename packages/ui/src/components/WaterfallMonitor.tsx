@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/api';
+import { ProcessTransactionResponse } from '../types/api.types';
 
 /**
  * Waterfall Monitor Component (REQ-3.1)
@@ -8,7 +9,7 @@ import { apiClient } from '../services/api';
 export function WaterfallMonitor() {
   const [shadowMode, setShadowMode] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [lastResult, setLastResult] = useState<any>(null);
+  const [lastResult, setLastResult] = useState<ProcessTransactionResponse | null>(null);
 
   useEffect(() => {
     loadShadowMode();

@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/api';
+import { FlaggedCase } from '../types/api.types';
 
 /**
  * Case Triage Component (REQ-3.3)
  * View of flagged transactions for investigation
  */
 export function CaseTriage() {
-  const [cases, setCases] = useState<any[]>([]);
+  const [cases, setCases] = useState<FlaggedCase[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedCase, setSelectedCase] = useState<any>(null);
+  const [selectedCase, setSelectedCase] = useState<FlaggedCase | null>(null);
   const [minScore, setMinScore] = useState(50);
 
   useEffect(() => {
@@ -32,14 +33,14 @@ export function CaseTriage() {
       setCases([
         {
           id: 'case-1',
-          transaction: { id: 'txn-001', userId: 'user-123', amount: 15000 },
+          transaction: { id: 'txn-001', userId: 'user-123', amount: 15000, timestamp: new Date().toISOString() },
           totalScore: 70,
           flagged: true,
           timestamp: new Date().toISOString(),
         },
         {
           id: 'case-2',
-          transaction: { id: 'txn-002', userId: 'user-456', amount: 8000 },
+          transaction: { id: 'txn-002', userId: 'user-456', amount: 8000, timestamp: new Date().toISOString() },
           totalScore: 60,
           flagged: true,
           timestamp: new Date().toISOString(),
