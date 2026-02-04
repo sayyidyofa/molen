@@ -1,0 +1,11 @@
+{
+  "name": "@molen/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared configuration for Molen monorepo",
+  "main": "index.js",
+  "files": [
+    "eslint.config.js",
+    "tsconfig.base.json"
+  ]
+}

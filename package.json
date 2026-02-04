@@ -1,0 +1,30 @@
+{
+  "name": "molen",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fraud-Ops Control Plane - High-performance fraud detection orchestration system",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "bun --cwd packages/api run dev",
+    "dev:ui": "bun --cwd packages/ui run dev",
+    "build": "bun run build:core && bun run build:api && bun run build:ui",
+    "build:core": "bun --cwd packages/core run build",
+    "build:api": "bun --cwd packages/api run build",
+    "build:ui": "bun --cwd packages/ui run build",
+    "test": "bun test",
+    "test:core": "bun --cwd packages/core test",
+    "test:api": "bun --cwd packages/api test",
+    "test:ui": "bun --cwd packages/ui test",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

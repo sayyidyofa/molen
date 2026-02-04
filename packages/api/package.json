@@ -1,0 +1,21 @@
+{
+  "name": "@molen/api",
+  "version": "0.1.0",
+  "description": "Bun-powered ElysiaJS backend for Fraud-Ops Control Plane",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "start": "bun run src/index.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "elysia": "^0.8.14",
+    "@elysiajs/cors": "^0.8.0",
+    "@molen/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.3"
+  }
+}
