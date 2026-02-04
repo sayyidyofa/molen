@@ -6,7 +6,7 @@ export interface Transaction {
   userId: string;
   amount: number;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**

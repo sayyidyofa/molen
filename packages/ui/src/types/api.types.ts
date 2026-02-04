@@ -65,14 +65,16 @@ export interface PublishResponse {
 
 export interface ProcessTransactionResponse {
   transaction: Transaction;
-  results: Array<{
-    transactionId: string;
-    score: number;
-    flags: string[];
-    timestamp: Date;
-    ruleType: string;
-  }>;
+  results: EvaluationResult[];
   totalScore: number;
   flagged: boolean;
   shadowMode: boolean;
+}
+
+export interface EvaluationResult {
+  transactionId: string;
+  score: number;
+  flags: string[];
+  timestamp: Date;
+  ruleType: string;
 }

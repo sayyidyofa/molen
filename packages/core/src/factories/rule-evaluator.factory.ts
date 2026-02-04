@@ -4,6 +4,14 @@ import { VelocityRuleEvaluator } from '../rules/velocity-evaluator';
 import { ExternalClientFactory } from './client.factory';
 
 /**
+ * Configuration for rule evaluators
+ */
+export interface RuleEvaluatorConfig {
+  stateless?: { highAmountThreshold?: number };
+  velocity?: { transactionsPerMinute?: number; transactionsPerHour?: number };
+}
+
+/**
  * Factory for creating rule evaluators with different strategies
  * Implements REQ-1.1 from the SRS
  */
@@ -27,7 +35,7 @@ export class RuleEvaluatorFactory {
   /**
    * Create a combined evaluator that runs both stateless and velocity checks
    */
-  static createCombinedEvaluator(config?: any): IRuleEvaluator[] {
+  static createCombinedEvaluator(config?: RuleEvaluatorConfig): IRuleEvaluator[] {
     return [
       this.createStatelessEvaluator(config?.stateless),
       this.createVelocityEvaluator(config?.velocity),

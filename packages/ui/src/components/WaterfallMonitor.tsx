@@ -89,7 +89,7 @@ export function WaterfallMonitor() {
           <p><strong>Flagged:</strong> {lastResult.flagged ? 'YES' : 'NO'}</p>
           
           <h4>Evaluation Results:</h4>
-          {lastResult.results.map((result: any, idx: number) => (
+          {lastResult.results.map((result, idx: number) => (
             <div key={idx} style={{ marginLeft: '20px', marginBottom: '10px' }}>
               <p><strong>Rule Type:</strong> {result.ruleType}</p>
               <p><strong>Score:</strong> {result.score}</p>

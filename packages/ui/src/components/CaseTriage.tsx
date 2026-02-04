@@ -123,7 +123,7 @@ export function CaseTriage() {
                     <p><strong>Total Score:</strong> {selectedCase.totalScore}</p>
                     
                     <h4>Evaluation Results:</h4>
-                    {selectedCase.results?.map((result: any, idx: number) => (
+                    {selectedCase.results?.map((result, idx: number) => (
                       <div key={idx} style={{ marginLeft: '20px', marginBottom: '10px' }}>
                         <p><strong>Rule Type:</strong> {result.ruleType}</p>
                         <p><strong>Score:</strong> {result.score}</p>
