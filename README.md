@@ -105,6 +105,24 @@ bun run test:ui
 ### Mock Mode
 Set `USE_MOCKS=true` to use mock implementations of external services (REQ-2.2).
 
+## Type Checking and Linting
+
+```bash
+# Type check all packages
+bun run typecheck
+
+# Type check individual packages
+bun run typecheck:core
+bun run typecheck:api
+bun run typecheck:ui
+
+# Lint all packages
+bun run lint
+
+# Lint and auto-fix issues
+bun run lint:fix
+```
+
 ## Building for Production
 
 ```bash
