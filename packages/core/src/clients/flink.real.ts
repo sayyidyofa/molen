@@ -4,10 +4,8 @@ import { IFlinkClient } from './flink.interface';
  * Real Flink client implementation for stream processing
  */
 export class RealFlinkClient implements IFlinkClient {
-  private apiUrl: string;
-
-  constructor(config: { apiUrl: string }) {
-    this.apiUrl = config.apiUrl;
+  constructor(private config: { apiUrl: string }) {
+    // config.apiUrl will be used when implementing real Flink REST API calls
   }
 
   async submitJob(_jobConfig: object): Promise<string> {

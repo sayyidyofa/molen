@@ -30,11 +30,11 @@ export class RealElasticClient implements IElasticClient {
   }
 
   async search(params: object): Promise<any> {
-    return await this.client.search(params);
+    return await this.client.search(params as any);
   }
 
   async index(params: object): Promise<any> {
-    return await this.client.index(params);
+    return await this.client.index(params as any);
   }
 
   async close(): Promise<void> {

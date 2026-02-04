@@ -4,14 +4,10 @@ import { IRedisClient } from './redis.interface';
  * Real Redis client implementation for velocity state management
  */
 export class RealRedisClient implements IRedisClient {
-  private host: string;
-  private port: number;
-
-  constructor(config: { host: string; port: number }) {
-    this.host = config.host;
-    this.port = config.port;
+  constructor(private config: { host: string; port: number }) {
     // In production, initialize actual Redis client
-    // this.client = new Redis({ host: this.host, port: this.port });
+    // this.client = new Redis({ host: this.config.host, port: this.config.port });
+    // config.host and config.port will be used when implementing real Redis client
   }
 
   async get(_key: string): Promise<string | null> {
