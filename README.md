@@ -93,17 +93,28 @@ bun run dev
 ## Testing
 
 ```bash
-# Run all tests
+# Run all unit tests
 bun test
 
 # Run tests for specific package
 bun run test:core
 bun run test:api
 bun run test:ui
+
+# Run integration tests (requires credentials)
+cd packages/core
+bun test tests/integration
 ```
 
 ### Mock Mode
 Set `USE_MOCKS=true` to use mock implementations of external services (REQ-2.2).
+
+### Integration Tests
+Integration tests verify connectivity with real Elasticsearch, Flink, and Redis services:
+- Tests require credentials (via environment variables or GitHub Secrets)
+- Designed to work with free-tier services (minimal Redis operations)
+- See [INTEGRATION_TEST_GUIDE.md](INTEGRATION_TEST_GUIDE.md) for detailed setup instructions
+- See [GITHUB_SECRETS_SETUP.md](GITHUB_SECRETS_SETUP.md) for configuring CI/CD secrets
 
 ## Type Checking and Linting
 
