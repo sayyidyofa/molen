@@ -8,10 +8,23 @@ import { IElasticClient } from './elastic.interface';
 export class RealElasticClient implements IElasticClient {
   private client: Client;
 
-  constructor(config: { node: string; caPath?: string }) {
+  constructor(config: { 
+    node: string; 
+    caPath?: string;
+    username?: string;
+    password?: string;
+  }) {
     const clientConfig: any = {
       node: config.node,
     };
+
+    // Add basic auth if credentials are provided
+    if (config.username && config.password) {
+      clientConfig.auth = {
+        username: config.username,
+        password: config.password,
+      };
+    }
 
     // Add SSL/TLS configuration if CA certificate path is provided (REQ-2.3)
     if (config.caPath) {

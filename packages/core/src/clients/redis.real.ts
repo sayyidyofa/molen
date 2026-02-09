@@ -1,30 +1,42 @@
 import { IRedisClient } from './redis.interface';
+import Redis from 'ioredis';
 
 /**
  * Real Redis client implementation for velocity state management
  */
 export class RealRedisClient implements IRedisClient {
-  constructor(private config: { host: string; port: number }) {
-    // In production, initialize actual Redis client
-    // this.client = new Redis({ host: this.config.host, port: this.config.port });
-    // config.host and config.port will be used when implementing real Redis client
+  private client: Redis;
+
+  constructor(config: { host: string; port: number; password?: string } | { url: string }) {
+    // Support both connection string and individual config
+    if ('url' in config) {
+      this.client = new Redis(config.url);
+    } else {
+      this.client = new Redis({
+        host: config.host,
+        port: config.port,
+        password: config.password,
+      });
+    }
   }
 
-  async get(_key: string): Promise<string | null> {
-    // Placeholder for real Redis implementation
-    return null;
+  async get(key: string): Promise<string | null> {
+    return await this.client.get(key);
   }
 
-  async set(_key: string, _value: string, _expirySeconds?: number): Promise<void> {
-    // Placeholder for real Redis implementation
+  async set(key: string, value: string, expirySeconds?: number): Promise<void> {
+    if (expirySeconds) {
+      await this.client.setex(key, expirySeconds, value);
+    } else {
+      await this.client.set(key, value);
+    }
   }
 
-  async incr(_key: string): Promise<number> {
-    // Placeholder for real Redis implementation
-    return 1;
+  async incr(key: string): Promise<number> {
+    return await this.client.incr(key);
   }
 
   async close(): Promise<void> {
-    // Placeholder for real Redis implementation
+    await this.client.quit();
   }
 }
