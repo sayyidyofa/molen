@@ -16,8 +16,14 @@ This project uses a **monorepo architecture** with the following packages:
 ### Interface Factory Pattern
 The system implements the Interface Factory Pattern for:
 - **Rule Evaluation** (Stateless and Velocity evaluators)
-- **External Service Clients** (Elasticsearch, Redis, Flink)
+- **External Service Clients** (Elasticsearch, Redis, Flink, S3)
 - Mock implementations for testing
+
+### ML Model Storage
+- **S3-Compatible Storage** for ML models using Cloudflare R2
+- Supports model versioning and metadata
+- Integration with Flink for training and inference workflows
+- See [S3_STORAGE_GUIDE.md](S3_STORAGE_GUIDE.md) for details
 
 ### Shadow Mode (REQ-1.2)
 Toggle shadow mode to log fraud scores without interrupting live transaction flow.

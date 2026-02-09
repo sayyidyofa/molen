@@ -42,6 +42,17 @@ The following secrets need to be added to your GitHub repository:
 
 **Purpose**: Connect to Redis Cloud free tier for testing basic operations.
 
+### S3 Storage Credentials (Cloudflare R2)
+
+| Secret Name | Value |
+|------------|-------|
+| `S3_ENDPOINT` | `https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com` |
+| `S3_ACCESS_KEY_ID` | `e6cf9886c1fb510ce1f5afd212cd7c07` |
+| `S3_SECRET_ACCESS_KEY` | `6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838` |
+| `S3_BUCKET` | `ml-models` |
+
+**Purpose**: Connect to Cloudflare R2 for testing ML model storage operations.
+
 ## How to Add Secrets
 
 ### Step-by-Step Instructions
@@ -59,7 +70,7 @@ The following secrets need to be added to your GitHub repository:
    - Enter the secret name (e.g., `ELASTIC_URL`)
    - Enter the secret value
    - Click "Add secret"
-   - Repeat for all 7 secrets
+   - Repeat for all 11 secrets
 
 ### Screenshot Guide
 
