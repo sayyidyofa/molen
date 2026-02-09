@@ -2,6 +2,7 @@
 export { IElasticClient } from './clients/elastic.interface';
 export { IRedisClient } from './clients/redis.interface';
 export { IFlinkClient } from './clients/flink.interface';
+export { IS3Client } from './clients/s3.interface';
 
 // Client implementations
 export { RealElasticClient } from './clients/elastic.real';
@@ -10,6 +11,8 @@ export { RealRedisClient } from './clients/redis.real';
 export { MockRedisClient } from './clients/redis.mock';
 export { RealFlinkClient } from './clients/flink.real';
 export { MockFlinkClient } from './clients/flink.mock';
+export { RealS3Client } from './clients/s3.real';
+export { MockS3Client } from './clients/s3.mock';
 
 // Rule evaluator interfaces
 export { IRuleEvaluator } from './rules/rule-evaluator.interface';

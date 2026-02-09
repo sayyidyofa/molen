@@ -1,6 +1,6 @@
 # Integration Tests
 
-This directory contains integration tests for external service clients (Elasticsearch, Flink, and Redis).
+This directory contains integration tests for external service clients (Elasticsearch, Flink, Redis, and S3).
 
 ## Overview
 
@@ -29,6 +29,11 @@ export FLINK_CLIENT_SECRET="your-client-secret"
 
 export REDIS_URL="redis://default:password@host:port"
 
+export S3_ENDPOINT="https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com"
+export S3_ACCESS_KEY_ID="your-access-key"
+export S3_SECRET_ACCESS_KEY="your-secret-key"
+export S3_BUCKET="ml-models"
+
 # Run integration tests
 bun test tests/integration
 ```
@@ -41,13 +46,10 @@ Integration tests run automatically via GitHub Actions workflow when:
 - Pull requests affect client code
 
 Credentials are stored as GitHub repository secrets:
-- `ELASTIC_URL`
-- `ELASTIC_USERNAME`
-- `ELASTIC_PASSWORD`
-- `FLINK_URL`
-- `FLINK_CLIENT_ID`
-- `FLINK_CLIENT_SECRET`
+- `ELASTIC_URL`, `ELASTIC_USERNAME`, `ELASTIC_PASSWORD`
+- `FLINK_URL`, `FLINK_CLIENT_ID`, `FLINK_CLIENT_SECRET`
 - `REDIS_URL`
+- `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`
 
 ## Test Coverage
 
@@ -68,6 +70,15 @@ Credentials are stored as GitHub repository secrets:
 - Non-existent key handling
 - **Note**: Tests are minimal to avoid stressing free tier
 
+### S3 Storage (s3.integration.test.ts)
+- Connection to Cloudflare R2 or S3-compatible storage
+- Model upload with metadata
+- Model download and verification
+- Model listing with prefix filtering
+- Model existence checking
+- Model deletion
+- **Note**: Tests clean up after themselves
+
 ## Credentials Format
 
 ### Elasticsearch
@@ -83,6 +94,13 @@ Credentials are stored as GitHub repository secrets:
 ### Redis
 - Connection string format: `redis://[username]:[password]@[host]:[port]`
 - Example: `redis://default:password@redis-12394.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:12394`
+
+### S3 Storage (Cloudflare R2)
+- Endpoint: `https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com`
+- Access Key ID: S3-compatible access key
+- Secret Access Key: S3-compatible secret key
+- Bucket: `ml-models` (or your bucket name)
+- Region: `auto` (for Cloudflare R2)
 
 ## Security Notes
 

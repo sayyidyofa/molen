@@ -7,6 +7,9 @@ import { MockRedisClient } from '../clients/redis.mock';
 import { IFlinkClient } from '../clients/flink.interface';
 import { RealFlinkClient } from '../clients/flink.real';
 import { MockFlinkClient } from '../clients/flink.mock';
+import { IS3Client } from '../clients/s3.interface';
+import { RealS3Client } from '../clients/s3.real';
+import { MockS3Client } from '../clients/s3.mock';
 
 /**
  * Factory for creating external service clients with environment-based switching
@@ -56,5 +59,34 @@ export class ExternalClientFactory {
     const apiUrl = process.env.FLINK_API_URL || 'http://localhost:8081';
     
     return new RealFlinkClient({ apiUrl });
+  }
+
+  /**
+   * Create an S3 client for ML model storage
+   * Uses mock implementation when USE_MOCKS=true
+   * Supports Cloudflare R2 and other S3-compatible endpoints
+   */
+  static createS3Client(): IS3Client {
+    if (process.env.USE_MOCKS === 'true') {
+      return new MockS3Client();
+    }
+
+    const endpoint = process.env.S3_ENDPOINT || 'https://s3.amazonaws.com';
+    const accessKeyId = process.env.S3_ACCESS_KEY_ID || '';
+    const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY || '';
+    const bucket = process.env.S3_BUCKET || 'ml-models';
+    const region = process.env.S3_REGION;
+
+    if (!accessKeyId || !secretAccessKey) {
+      throw new Error('S3 credentials not provided. Set S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY environment variables.');
+    }
+
+    return new RealS3Client({
+      endpoint,
+      accessKeyId,
+      secretAccessKey,
+      bucket,
+      region,
+    });
   }
 }
