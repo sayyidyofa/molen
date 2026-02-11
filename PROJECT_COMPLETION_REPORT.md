@@ -8,7 +8,6 @@
 
 ## Executive Summary
 
-Project Molen has been successfully transformed from a static Flink-based fraud detection system into a **Self-Service Internal Developer Platform (IDP)** that empowers Fraud Strategy Analysts to train, test, and deploy ML models without writing code.
 
 ### Key Achievement
 
@@ -84,8 +83,8 @@ Train Model → Deploy Shadow → Wait 48-72h → Compare Metrics → Promote if
 
 #### ✅ REQ-3: Declarative Rule Management
 **Delivered:**
-- `IRedpandaConnectClient` interface for pipeline management
-- YAML-based Redpanda Connect pipeline configuration
+- `IKafkaConnectClient` interface for pipeline management
+- YAML-based Kafka Connect pipeline configuration
 - Dynamic pipeline reload: `reloadPipeline()` method
 - Integration with existing Rule Editor
 
@@ -118,14 +117,14 @@ Update Threshold → Publish → Pipeline Reloads → Rules Active
 #### ✅ Latency Target: 15-30ms
 **Strategy:**
 - Redpanda (10x faster than LavinMQ)
-- Redpanda Connect (native binary, minimal overhead)
+- Kafka Connect (native binary, minimal overhead)
 - Bun runtime (3x faster than Node.js)
 - Redis hot state (<1ms lookups)
 - Pre-loaded models (no disk I/O)
 
 **Budget:**
 - Redpanda ingress: 2-3ms
-- Redpanda Connect: 5-8ms
+- Kafka Connect: 5-8ms
 - Molen API: 8-12ms
 - Elasticsearch (async): 3-5ms
 - **Total: 18-28ms** ✅
@@ -153,7 +152,6 @@ Update Threshold → Publish → Pipeline Reloads → Rules Active
 | Component | V1 (Old) | V2 (New) | Benefit |
 |-----------|----------|----------|---------|
 | Message Broker | LavinMQ | Redpanda | 10x throughput |
-| Stream Processing | Apache Flink | Redpanda Connect | Declarative YAML |
 | Model Training | Manual | Self-service UI | Weekly updates |
 | Model Testing | Production only | Shadow mode | Zero risk |
 | Rule Updates | Code changes | YAML reload | Zero downtime |
@@ -161,8 +159,8 @@ Update Threshold → Publish → Pipeline Reloads → Rules Active
 
 ### New System Components
 
-1. **Redpanda Broker** - High-performance message streaming
-2. **Redpanda Connect** - YAML-based pipeline engine
+1. **Kafka Broker** - High-performance message streaming
+2. **Kafka Connect** - YAML-based pipeline engine
 3. **ML Training Service** - Self-service model training
 4. **Garage S3** - Training data storage (Parquet)
 5. **Cloudflare R2** - Model artifact storage
@@ -289,7 +287,7 @@ curl -X POST http://localhost:3000/ml/models/model-2/promote
 **Status:** Placeholder (real implementations pending)
 
 **Future Coverage:**
-- Real Redpanda Connect pipeline deployment
+- Real Kafka Connect pipeline deployment
 - Real ML training with Parquet files
 - Real model storage in S3/R2
 - End-to-end workflow validation
@@ -321,7 +319,6 @@ curl -X POST http://localhost:3000/ml/models/model-2/promote
 **Phase 4: Cleanup (Week 6)**
 - Backup V1 data
 - Stop V1 services
-- Remove Flink & LavinMQ
 - Update documentation
 
 ### Rollback Plan
@@ -510,7 +507,7 @@ curl -X POST http://localhost:3000/ml/models/model-2/promote
 
 ### Key Technologies
 - **Redpanda** - High-performance streaming
-- **Redpanda Connect** - Declarative pipelines
+- **Kafka Connect** - Declarative pipelines
 - **Bun** - Fast JavaScript runtime
 - **ElysiaJS** - High-performance web framework
 - **React + Vite** - Modern frontend stack

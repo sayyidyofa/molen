@@ -2,7 +2,6 @@
 
 ## Overview
 
-This guide helps teams migrate from Molen V1 (static Flink-based) to V2 (Self-Service Platform with Redpanda Connect).
 
 ## Migration Strategy: Parallel Run
 
@@ -43,7 +42,7 @@ services:
       - "19092:19092"
 ```
 
-#### Add Redpanda Connect
+#### Add Kafka Connect
 ```yaml
   redpanda-connect:
     image: redpandadata/connect:latest
@@ -52,7 +51,7 @@ services:
     volumes:
       - ./pipelines:/pipelines
     environment:
-      - REDPANDA_BROKER=redpanda:9092
+      - KAFKA_BROKER=redpanda:9092
       - MOLEN_API_URL=http://molen-api:3000
       - ELASTIC_URL=${ELASTIC_URL}
 ```
@@ -64,8 +63,8 @@ services:
       context: .
       dockerfile: Dockerfile.v2
     environment:
-      - REDPANDA_BROKER_URL=redpanda:9092
-      - REDPANDA_CONNECT_URL=http://redpanda-connect:4195
+      - KAFKA_BROKER_URL=redpanda:9092
+      - KAFKA_CONNECT_URL=http://redpanda-connect:4195
       - USE_MOCKS=false
     ports:
       - "3001:3000"  # V2 on different port initially
@@ -92,8 +91,8 @@ server {
 ### Validation Checklist
 
 - [ ] V2 API responds on port 3001
-- [ ] Redpanda broker accepting connections
-- [ ] Redpanda Connect pipelines running
+- [ ] Kafka broker accepting connections
+- [ ] Kafka Connect pipelines running
 - [ ] 10% of traffic routed to V2
 - [ ] Latency <30ms for V2 requests
 - [ ] No errors in V2 logs
@@ -254,7 +253,7 @@ curl -X POST http://localhost:3001/ml/models/model-v2/promote
 This:
 - Archives old V1 model
 - Sets V2 model as "live"
-- Reloads Redpanda Connect pipeline
+- Reloads Kafka Connect pipeline
 - Updates metadata in Postgres
 
 ### Step 2: Increase Traffic Gradually
@@ -461,7 +460,7 @@ Quick Commands:
 - [ ] Shadow mode accuracy validated
 - [ ] False positive rate improved
 - [ ] No errors in 1000 test transactions
-- [ ] Redpanda Connect pipeline stable for 7 days
+- [ ] Kafka Connect pipeline stable for 7 days
 - [ ] All monitoring dashboards updated
 - [ ] Team training completed
 - [ ] Rollback plan tested
@@ -502,8 +501,8 @@ curl -w "@curl-format.txt" http://localhost:3001/health
 ```
 
 **Solutions:**
-- Scale Redpanda brokers (add more partitions)
-- Optimize Redpanda Connect pipeline
+- Scale Kafka brokers (add more partitions)
+- Optimize Kafka Connect pipeline
 - Scale API instances
 
 ### Issue: Training Jobs Failing
@@ -649,10 +648,8 @@ Migration questions:
 
 ## Appendix: Comparison Table
 
-| Feature | V1 (Flink) | V2 (Redpanda Connect) |
 |---------|------------|------------------------|
 | Broker | LavinMQ | Redpanda (10x faster) |
-| Processing | Apache Flink | Redpanda Connect |
 | Configuration | Java code | YAML |
 | Model Training | Manual | Self-service UI |
 | Model Testing | Production only | Shadow mode |

@@ -2,11 +2,9 @@
 
 ## Executive Summary
 
-Project Molen has evolved from a static Flink-based fraud detection system into a **Self-Service Internal Developer Platform (IDP)** for Fraud Strategy Analysts. This architectural pivot enables non-developers to train, test, and deploy fraud detection models without writing code.
 
 ### Key Changes
 
-**From:** Hard-coded Flink jobs → **To:** Flexible Redpanda + Redpanda Connect pipelines  
 **From:** Static models → **To:** Self-service model training and deployment  
 **From:** Binary deployment → **To:** Shadow mode testing and gradual promotion  
 
@@ -18,15 +16,14 @@ Project Molen has evolved from a static Flink-based fraud detection system into 
 ┌────────────────────────────────────────────────────────────────────┐
 │                    INGRESS & STREAMING LAYER                        │
 │                                                                      │
-│  Raw Transaction Events → Redpanda Broker (Topic: transactions)    │
+│  Raw Transaction Events → Kafka Broker (Topic: transactions)    │
 │                                  ↓                                   │
 └──────────────────────────────────┼──────────────────────────────────┘
                                    │
 ┌──────────────────────────────────▼──────────────────────────────────┐
-│              WATERFALL ENGINE (Redpanda Connect)                     │
+│              WATERFALL ENGINE (Kafka Connect)                     │
 │                                                                      │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  Redpanda Connect Pipeline (replaces Flink)                 │   │
 │  │                                                              │   │
 │  │  1. Consume from Redpanda                                   │   │
 │  │  2. Enrich & Fetch Features → Redis (Hot State)            │   │
@@ -103,7 +100,7 @@ Project Molen has evolved from a static Flink-based fraud detection system into 
 │  │ 5. Promote      │ → If FP rate acceptable:                       │
 │  │                 │   • Archive old Live model                     │
 │  │                 │   • Promote Candidate → Live                   │
-│  │                 │   • Reload Redpanda Connect pipeline           │
+│  │                 │   • Reload Kafka Connect pipeline           │
 │  └─────────────────┘                                                │
 └────────────────────────────────────────────────────────────────────┘
 
@@ -111,7 +108,7 @@ Project Molen has evolved from a static Flink-based fraud detection system into 
 │                    STORAGE & PERSISTENCE LAYER                      │
 │                                                                      │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐   │
-│  │ Garage S3       │  │ Elasticsearch   │  │ Redis           │   │
+│  │ S3-compatible storage       │  │ Elasticsearch   │  │ Redis           │   │
 │  │                 │  │                 │  │                 │   │
 │  │ • Training Data │  │ • Alerts        │  │ • Velocity      │   │
 │  │   (Parquet)     │  │ • Eval Logs     │  │   Counters      │   │
@@ -166,16 +163,16 @@ Project Molen has evolved from a static Flink-based fraud detection system into 
 ### REQ-3: Declarative Rule Management ✅
 
 **Implementation:**
-- Redpanda Connect uses YAML-based pipeline configuration
+- Kafka Connect uses YAML-based pipeline configuration
 - Rule changes update YAML and trigger pipeline reload
-- `IRedpandaConnectClient.reloadPipeline()` method
+- `IKafkaConnectClient.reloadPipeline()` method
 - API endpoint: `POST /rules/publish` → triggers pipeline reload
 
 **Example YAML:**
 ```yaml
 input:
   kafka:
-    addresses: ["${REDPANDA_BROKER}:9092"]
+    addresses: ["${KAFKA_BROKER}:9092"]
     topics: ["transactions"]
     
 pipeline:
@@ -207,13 +204,12 @@ output:
 
 ### Before (V1)
 - **Message Broker:** LavinMQ
-- **Stream Processing:** Apache Flink (hard-coded jobs)
 - **Model Deployment:** Manual, static
 - **Configuration:** Code changes required
 
 ### After (V2)
 - **Message Broker:** Redpanda (Kafka-compatible, higher performance)
-- **Stream Processing:** Redpanda Connect (declarative YAML pipelines)
+- **Stream Processing:** Kafka Connect (declarative YAML pipelines)
 - **Model Training:** Self-service via UI
 - **Model Deployment:** Shadow mode → Promote workflow
 - **Configuration:** Dynamic YAML reload
@@ -273,9 +269,9 @@ Step 5: PROMOTE
 
 ### New Clients Added
 
-#### 1. IRedpandaConnectClient
+#### 1. IKafkaConnectClient
 ```typescript
-interface IRedpandaConnectClient {
+interface IKafkaConnectClient {
   deployPipeline(config: PipelineConfig): Promise<void>;
   getPipelineStatus(name: string): Promise<PipelineStatus>;
   reloadPipeline(name: string): Promise<void>;
@@ -284,7 +280,7 @@ interface IRedpandaConnectClient {
 }
 ```
 
-**Purpose:** Manage Redpanda Connect pipelines for the waterfall engine
+**Purpose:** Manage Kafka Connect pipelines for the waterfall engine
 
 #### 2. IMLTrainer
 ```typescript
@@ -302,7 +298,7 @@ interface IMLTrainer {
 
 ```typescript
 // In ExternalClientFactory
-static createRedpandaConnectClient(): IRedpandaConnectClient;
+static createKafkaConnectClient(): IKafkaConnectClient;
 static createMLTrainer(): IMLTrainer;
 ```
 
@@ -343,14 +339,14 @@ Both support:
 ### Optimization Strategies
 
 1. **Redpanda vs Kafka:** ~2x faster broker performance
-2. **Redpanda Connect:** Native binary, minimal overhead
+2. **Kafka Connect:** Native binary, minimal overhead
 3. **Bun Runtime:** ~3x faster than Node.js for API
 4. **Redis Hot State:** In-memory velocity checks (<1ms)
 5. **Model Inference:** Pre-loaded models, no disk I/O
 
 **Measured Latency Budget:**
 - Redpanda ingress: 2-3ms
-- Redpanda Connect processing: 5-8ms
+- Kafka Connect processing: 5-8ms
 - Molen API inference: 8-12ms
 - Elasticsearch logging: 3-5ms (async)
 - **Total:** 18-28ms ✅
@@ -388,10 +384,10 @@ CREATE TABLE model_audit (
 
 ```env
 # Redpanda
-REDPANDA_BROKER_URL=localhost:9092
-REDPANDA_CONNECT_URL=http://localhost:4195
+KAFKA_BROKER_URL=localhost:9092
+KAFKA_CONNECT_URL=http://localhost:4195
 
-# Garage S3 (Training Data & Models)
+# S3-compatible storage (Training Data & Models)
 GARAGE_ENDPOINT=https://garage.internal:3900
 GARAGE_ACCESS_KEY_ID=xxx
 GARAGE_SECRET_ACCESS_KEY=xxx
@@ -422,8 +418,8 @@ services:
   molen-api:
     build: ./packages/api
     environment:
-      - REDPANDA_BROKER_URL=redpanda:9092
-      - REDPANDA_CONNECT_URL=http://redpanda-connect:4195
+      - KAFKA_BROKER_URL=redpanda:9092
+      - KAFKA_CONNECT_URL=http://redpanda-connect:4195
       
   molen-ui:
     build: ./packages/ui
@@ -439,17 +435,14 @@ services:
 - Deploy V2 alongside V1
 - Route 10% of traffic to Redpanda
 - Monitor latency and accuracy
-- Keep Flink as backup
 
 ### Phase 2: Shadow Mode (Week 3-4)
 - Train new model using V2 platform
 - Run candidate in shadow mode
-- Compare with V1 Flink model
 - Validate false positive improvements
 
 ### Phase 3: Cutover (Week 5)
 - Route 100% of traffic to V2
-- Decomm Flink infrastructure
 - Train analysts on self-service UI
 
 ### Phase 4: Iteration (Ongoing)
@@ -462,7 +455,7 @@ services:
 ## Future Enhancements
 
 ### Short-term (Next Sprint)
-- [ ] Real Redpanda Connect client implementation
+- [ ] Real Kafka Connect client implementation
 - [ ] Real ML Trainer with Parquet support
 - [ ] Model training UI components
 - [ ] Prometheus metrics export
@@ -494,7 +487,7 @@ services:
 ## References
 
 - [Redpanda Documentation](https://docs.redpanda.com/)
-- [Redpanda Connect Guide](https://www.benthos.dev/)
+- [Kafka Connect Guide](https://www.benthos.dev/)
 - [Interface Factory Pattern](./IMPLEMENTATION.md)
 - [S3 Storage Guide](./S3_STORAGE_GUIDE.md)
 - [Integration Tests](./INTEGRATION_TEST_GUIDE.md)

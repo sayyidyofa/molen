@@ -2,7 +2,7 @@
 
 **Internal Developer Platform (IDP) for Fraud Strategy Analysts**
 
-Molen empowers fraud analysts to train, test, and deploy ML fraud detection models without writing code. Built on Redpanda + Redpanda Connect for flexible, high-performance stream processing.
+Molen empowers fraud analysts to train, test, and deploy ML fraud detection models without writing code. Built on Redpanda + Kafka Connect for flexible, high-performance stream processing.
 
 ## 🎯 Key Features
 
@@ -14,7 +14,7 @@ Molen empowers fraud analysts to train, test, and deploy ML fraud detection mode
 
 ### Real-Time Fraud Detection
 - **15-30ms Latency:** End-to-end transaction processing
-- **Redpanda Connect:** Declarative YAML-based waterfall pipelines
+- **Kafka Connect:** Declarative YAML-based waterfall pipelines
 - **Dynamic Reloading:** Update rules without downtime
 - **Comprehensive Audit:** Full trail of model deployments and decisions
 
@@ -32,10 +32,10 @@ This project uses a **monorepo architecture** with a self-service ML platform:
 ### Technology Stack
 
 - **Message Broker:** Redpanda (Kafka-compatible, high-performance)
-- **Stream Processing:** Redpanda Connect (declarative YAML pipelines)
+- **Stream Processing:** Kafka Connect (declarative YAML pipelines)
 - **API:** Bun + ElysiaJS (3x faster than Node.js)
 - **UI:** React + Vite
-- **ML Storage:** Garage S3 (training data) + Cloudflare R2 (models)
+- **ML Storage:** S3-compatible storage (training data) + Cloudflare R2 (models)
 - **Analytics:** Elasticsearch + Kibana
 - **State:** Redis (velocity counters)
 - **Metadata:** Postgres
@@ -69,8 +69,8 @@ PORT=3000
 SHADOW_MODE=false
 
 # Redpanda
-REDPANDA_BROKER_URL=localhost:9092
-REDPANDA_CONNECT_URL=http://localhost:4195
+KAFKA_BROKER_URL=localhost:9092
+KAFKA_CONNECT_URL=http://localhost:4195
 
 # Storage
 GARAGE_ENDPOINT=https://garage.internal:3900
@@ -146,7 +146,7 @@ POST /ml/models/:id/promote # Promote to live
 
 ### Declarative Rule Management (REQ-3)
 Update fraud rules via UI:
-- YAML-based Redpanda Connect pipelines
+- YAML-based Kafka Connect pipelines
 - Dynamic reload without downtime
 - Version control for rule changes
 - Audit trail of modifications
@@ -191,7 +191,6 @@ bun test tests/integration
 Set `USE_MOCKS=true` to use mock implementations of external services (REQ-2.2).
 
 ### Integration Tests
-Integration tests verify connectivity with real Elasticsearch, Flink, and Redis services:
 - Tests require credentials (via environment variables or GitHub Secrets)
 - Designed to work with free-tier services (minimal Redis operations)
 - See [INTEGRATION_TEST_GUIDE.md](INTEGRATION_TEST_GUIDE.md) for detailed setup instructions

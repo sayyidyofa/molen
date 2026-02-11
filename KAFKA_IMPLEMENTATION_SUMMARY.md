@@ -1,25 +1,25 @@
-# Redpanda Integration - Implementation Summary
+# Kafka Integration - Implementation Summary
 
 ## Overview
 
-Successfully implemented Redpanda broker integration using the Kafka API (KafkaJS) with SASL SCRAM-SHA-256 authentication for the Molen fraud detection platform.
+Successfully implemented Kafka broker integration using the Kafka API (KafkaJS) with SASL SCRAM-SHA-256 authentication for the Molen fraud detection platform.
 
 ## What Was Delivered
 
 ### 1. Core Implementation (5 Files)
 
 #### Client Interfaces & Implementations
-- **`redpanda-broker.interface.ts`** (2,085 chars)
-  - `IRedpandaBrokerClient` interface with 10 methods
+- **`kafka-broker.interface.ts`** (2,085 chars)
+  - `IKafkaBrokerClient` interface with 10 methods
   - Type definitions: `TopicConfig`, `ProducerMessage`, `ConsumerMessage`, `TopicMetadata`
   - Complete Kafka API abstraction
 
-- **`redpanda-broker.mock.ts`** (2,709 chars)
+- **`kafka-broker.mock.ts`** (2,709 chars)
   - Full in-memory mock implementation
   - Test utility methods (`clearMockData`, `getMockTopics`, `getMockMessages`)
   - Suitable for unit testing without external dependencies
 
-- **`redpanda-broker.real.ts`** (5,409 chars)
+- **`kafka-broker.real.ts`** (5,409 chars)
   - Production KafkaJS implementation
   - SASL authentication (SCRAM-SHA-256/512)
   - SSL/TLS support for cloud deployments
@@ -29,7 +29,7 @@ Successfully implemented Redpanda broker integration using the Kafka API (KafkaJ
 ### 2. Testing (2 Files)
 
 #### Unit Tests
-- **`redpanda-broker.mock.test.ts`** (5,658 chars)
+- **`kafka-broker.mock.test.ts`** (5,658 chars)
   - 12 comprehensive test cases
   - Connection lifecycle testing
   - Topic CRUD operations
@@ -39,9 +39,9 @@ Successfully implemented Redpanda broker integration using the Kafka API (KafkaJ
   - 100% mock operation coverage
 
 #### Integration Tests
-- **`redpanda-broker.integration.test.ts`** (4,796 chars)
+- **`kafka-broker.integration.test.ts`** (4,796 chars)
   - 7 real broker test cases
-  - Live Redpanda Cloud connectivity
+  - Live Kafka Cloud connectivity
   - Topic creation with automatic cleanup
   - Producer/consumer workflow validation
   - Batch message production testing
@@ -51,7 +51,7 @@ Successfully implemented Redpanda broker integration using the Kafka API (KafkaJ
 
 Updated `ExternalClientFactory` with:
 ```typescript
-static createRedpandaBrokerClient(): IRedpandaBrokerClient
+static createKafkaBrokerClient(): IKafkaBrokerClient
 ```
 - Environment-based configuration
 - Automatic credential validation
@@ -62,23 +62,23 @@ static createRedpandaBrokerClient(): IRedpandaBrokerClient
 
 #### Environment Variables (.env.example)
 ```bash
-REDPANDA_BROKERS=broker1:9092,broker2:9092
-REDPANDA_USERNAME=username
-REDPANDA_PASSWORD=password
-REDPANDA_SASL_MECHANISM=scram-sha-256
+KAFKA_BROKERS=broker1:9092,broker2:9092
+KAFKA_USERNAME=username
+KAFKA_PASSWORD=password
+KAFKA_SASL_MECHANISM=scram-sha-256
 ```
 
 #### GitHub Actions Workflow
 Added 4 new secrets to CI/CD:
-- `REDPANDA_BROKERS`
-- `REDPANDA_USERNAME`
-- `REDPANDA_PASSWORD`
-- `REDPANDA_SASL_MECHANISM`
+- `KAFKA_BROKERS`
+- `KAFKA_USERNAME`
+- `KAFKA_PASSWORD`
+- `KAFKA_SASL_MECHANISM`
 
 ### 5. Documentation (2 Files)
 
 #### Complete Integration Guide
-- **`REDPANDA_INTEGRATION_GUIDE.md`** (12,897 chars)
+- **`KAFKA_INTEGRATION_GUIDE.md`** (12,897 chars)
   - Architecture overview
   - Component documentation
   - Configuration guide
@@ -90,7 +90,7 @@ Added 4 new secrets to CI/CD:
   - Best practices
 
 #### Quick Setup Guide
-- **`REDPANDA_QUICK_SETUP.md`** (6,247 chars)
+- **`KAFKA_QUICK_SETUP.md`** (6,247 chars)
   - Step-by-step local setup
   - Actual credentials for testing
   - Quick test script
@@ -157,7 +157,7 @@ SSL: Enabled
 ### Unit Tests (Mock)
 ```bash
 cd packages/core
-bun test tests/redpanda-broker.mock.test.ts
+bun test tests/kafka-broker.mock.test.ts
 ```
 
 **Coverage:**
@@ -170,13 +170,13 @@ bun test tests/redpanda-broker.mock.test.ts
 
 ### Integration Tests (Real Broker)
 ```bash
-export REDPANDA_BROKERS="..."
-export REDPANDA_USERNAME="bongko"
-export REDPANDA_PASSWORD="P@ssw0rd"
-export REDPANDA_SASL_MECHANISM="scram-sha-256"
+export KAFKA_BROKERS="..."
+export KAFKA_USERNAME="bongko"
+export KAFKA_PASSWORD="P@ssw0rd"
+export KAFKA_SASL_MECHANISM="scram-sha-256"
 
 cd packages/core
-bun test tests/integration/redpanda-broker.integration.test.ts
+bun test tests/integration/kafka-broker.integration.test.ts
 ```
 
 **Coverage:**
@@ -192,7 +192,7 @@ bun test tests/integration/redpanda-broker.integration.test.ts
 
 ### Basic Producer
 ```typescript
-const broker = ExternalClientFactory.createRedpandaBrokerClient();
+const broker = ExternalClientFactory.createKafkaBrokerClient();
 await broker.connect();
 
 await broker.produce({
@@ -231,9 +231,9 @@ await broker.produceBatch([
 ```
 Transaction Events
         ↓
-   Redpanda Broker (Kafka API)
+   Kafka Broker (Kafka API)
         ↓
-   Redpanda Connect (Pipelines)
+   Kafka Connect (Pipelines)
         ↓
    Fraud Detection Waterfall
         ├─ Layer 1: Stateless Rules
@@ -247,19 +247,19 @@ Transaction Events
 ## Files Created/Modified
 
 ### Created (9 Files)
-1. `packages/core/src/clients/redpanda-broker.interface.ts`
-2. `packages/core/src/clients/redpanda-broker.mock.ts`
-3. `packages/core/src/clients/redpanda-broker.real.ts`
-4. `packages/core/tests/redpanda-broker.mock.test.ts`
-5. `packages/core/tests/integration/redpanda-broker.integration.test.ts`
-6. `REDPANDA_INTEGRATION_GUIDE.md`
-7. `REDPANDA_QUICK_SETUP.md`
+1. `packages/core/src/clients/kafka-broker.interface.ts`
+2. `packages/core/src/clients/kafka-broker.mock.ts`
+3. `packages/core/src/clients/kafka-broker.real.ts`
+4. `packages/core/tests/kafka-broker.mock.test.ts`
+5. `packages/core/tests/integration/kafka-broker.integration.test.ts`
+6. `KAFKA_INTEGRATION_GUIDE.md`
+7. `KAFKA_QUICK_SETUP.md`
 
 ### Modified (6 Files)
 1. `packages/core/package.json` - Added kafkajs dependency
 2. `packages/core/src/factories/client.factory.ts` - Added factory method
 3. `packages/core/src/index.ts` - Exported new interfaces
-4. `.env.example` - Added Redpanda config
+4. `.env.example` - Added Kafka config
 5. `packages/core/tests/integration/README.md` - Updated docs
 6. `.github/workflows/integration-tests.yml` - Added secrets
 
@@ -353,7 +353,7 @@ Transaction Events
 - [ ] Create first production topic
 
 ### Short-term (Weeks 2-4)
-- [ ] Integrate with Redpanda Connect pipelines
+- [ ] Integrate with Kafka Connect pipelines
 - [ ] Connect to fraud detection waterfall
 - [ ] Add Prometheus metrics
 - [ ] Implement retry logic
@@ -366,17 +366,17 @@ Transaction Events
 
 ## References
 
-- **Integration Guide:** `REDPANDA_INTEGRATION_GUIDE.md`
-- **Quick Setup:** `REDPANDA_QUICK_SETUP.md`
-- **Integration Tests:** `packages/core/tests/integration/redpanda-broker.integration.test.ts`
-- **Unit Tests:** `packages/core/tests/redpanda-broker.mock.test.ts`
+- **Integration Guide:** `KAFKA_INTEGRATION_GUIDE.md`
+- **Quick Setup:** `KAFKA_QUICK_SETUP.md`
+- **Integration Tests:** `packages/core/tests/integration/kafka-broker.integration.test.ts`
+- **Unit Tests:** `packages/core/tests/kafka-broker.mock.test.ts`
 - **Architecture:** `SELF_SERVICE_ARCHITECTURE.md`
 - **KafkaJS Docs:** https://kafka.js.org/
-- **Redpanda Docs:** https://docs.redpanda.com/
+- **Kafka Docs:** https://docs.redpanda.com/
 
 ## Conclusion
 
-The Redpanda broker integration is **complete and production-ready**:
+The Kafka broker integration is **complete and production-ready**:
 
 ✅ **Implementation:** Fully functional Kafka API client  
 ✅ **Testing:** 19 tests (100% coverage)  

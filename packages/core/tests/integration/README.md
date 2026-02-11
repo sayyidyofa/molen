@@ -34,10 +34,10 @@ export S3_ACCESS_KEY_ID="your-access-key"
 export S3_SECRET_ACCESS_KEY="your-secret-key"
 export S3_BUCKET="ml-models"
 
-export REDPANDA_BROKERS="broker1:9092,broker2:9092"
-export REDPANDA_USERNAME="your-username"
-export REDPANDA_PASSWORD="your-password"
-export REDPANDA_SASL_MECHANISM="scram-sha-256"
+export KAFKA_BROKERS="broker1:9092,broker2:9092"
+export KAFKA_USERNAME="your-username"
+export KAFKA_PASSWORD="your-password"
+export KAFKA_SASL_MECHANISM="scram-sha-256"
 
 # Run integration tests
 bun test tests/integration
@@ -55,11 +55,11 @@ Credentials are stored as GitHub repository secrets:
 - `FLINK_URL`, `FLINK_CLIENT_ID`, `FLINK_CLIENT_SECRET`
 - `REDIS_URL`
 - `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`
-- `REDPANDA_BROKERS`, `REDPANDA_USERNAME`, `REDPANDA_PASSWORD`, `REDPANDA_SASL_MECHANISM`
+- `KAFKA_BROKERS`, `KAFKA_USERNAME`, `KAFKA_PASSWORD`, `KAFKA_SASL_MECHANISM`
 
 ## Test Coverage
 
-### Redpanda Broker (redpanda-broker.integration.test.ts)
+### Kafka Broker (kafka-broker.integration.test.ts)
 - Connection with SASL authentication (SCRAM-SHA-256/512)
 - Topic creation and deletion
 - Topic metadata retrieval
@@ -96,16 +96,16 @@ Credentials are stored as GitHub repository secrets:
 
 ## Credentials Format
 
-### Redpanda Broker (Kafka API)
+### Kafka Broker (Kafka API)
 - Brokers: Comma-separated list `broker1:9092,broker2:9092`
 - Auth: SASL with SCRAM-SHA-256 or SCRAM-SHA-512
 - SSL: Required (enabled by default)
 - Example: 
   ```
-  REDPANDA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
-  REDPANDA_USERNAME=bongko
-  REDPANDA_PASSWORD=your-password
-  REDPANDA_SASL_MECHANISM=scram-sha-256
+  KAFKA_BROKERS=your-kafka-broker:9092
+  KAFKA_USERNAME=bongko
+  KAFKA_PASSWORD=your-password
+  KAFKA_SASL_MECHANISM=scram-sha-256
   ```
 
 ### Elasticsearch

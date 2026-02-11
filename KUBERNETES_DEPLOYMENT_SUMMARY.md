@@ -14,7 +14,7 @@ Completely rewritten to showcase the Self-Service ML lifecycle:
 
 **Features Demonstrated:**
 - Interface Factory Pattern with all 5 clients
-- Redpanda broker integration (connect, create topics, produce/consume)
+- Kafka broker integration (connect, create topics, produce/consume)
 - ML Training workflow ("The Molen Path"):
   - Extract 7-day data window
   - Submit training job
@@ -109,17 +109,15 @@ Completely rewritten to showcase the Self-Service ML lifecycle:
 - 11 credential fields
 
 **Required Secrets:**
-1. FLINK_CLIENT_ID
-2. FLINK_CLIENT_SECRET
 3. ELASTIC_USERNAME
 4. ELASTIC_PASSWORD
 5. REDIS_URL
 6. S3_ENDPOINT
 7. S3_ACCESS_KEY_ID
 8. S3_SECRET_ACCESS_KEY
-9. REDPANDA_BROKERS
-10. REDPANDA_USERNAME
-11. REDPANDA_PASSWORD
+9. KAFKA_BROKERS
+10. KAFKA_USERNAME
+11. KAFKA_PASSWORD
 
 #### api-deployment.yaml
 - Deployment for API pods
@@ -198,17 +196,15 @@ Completely rewritten to showcase the Self-Service ML lifecycle:
 - KUBE_NAMESPACE
 
 **Application Credentials:**
-- FLINK_CLIENT_ID
-- FLINK_CLIENT_SECRET
 - ELASTIC_USERNAME
 - ELASTIC_PASSWORD
 - REDIS_URL
 - S3_ENDPOINT
 - S3_ACCESS_KEY_ID
 - S3_SECRET_ACCESS_KEY
-- REDPANDA_BROKERS
-- REDPANDA_USERNAME
-- REDPANDA_PASSWORD
+- KAFKA_BROKERS
+- KAFKA_USERNAME
+- KAFKA_PASSWORD
 
 ### 5. Deployment Scripts ✅
 

@@ -16,9 +16,6 @@ export KUBE_API_URL="https://api.rm1.0a51.p1.openshiftapps.com:6443"
 export KUBE_SERVICE_TOKEN="eyJhbGciOiJSUzI1NiIsImtpZCI6InZsU2VfaGN6MmRWNUg4elFnZWFWZEk3REM4RC1LVlZLMnZnTkhjYU9LMW8ifQ..."
 export KUBE_NAMESPACE="sayyidyofa-dev"
 
-# Flink
-export FLINK_CLIENT_ID="9e677b2b60b017835bca23b3267cd224.access"
-export FLINK_CLIENT_SECRET="9f156234b1a72bc0ba68ee25683ff1844b4a5dd1ab29a89f4d647deeefaa5559"
 
 # Elasticsearch
 export ELASTIC_USERNAME="sayyidyofa"
@@ -33,9 +30,9 @@ export S3_ACCESS_KEY_ID="e6cf9886c1fb510ce1f5afd212cd7c07"
 export S3_SECRET_ACCESS_KEY="6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838"
 
 # Redpanda
-export REDPANDA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
-export REDPANDA_USERNAME="bongko"
-export REDPANDA_PASSWORD="P@ssw0rd"
+export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
+export KAFKA_USERNAME="bongko"
+export KAFKA_PASSWORD="P@ssw0rd"
 ```
 
 ### 2. Deploy
@@ -143,17 +140,15 @@ Go to: Settings → Secrets and variables → Actions
 | KUBE_API_URL | https://api.rm1.0a51.p1.openshiftapps.com:6443 |
 | KUBE_SERVICE_TOKEN | eyJhbGciOiJSUzI1NiIsImtpZCI6InZsU2VfaGN6... |
 | KUBE_NAMESPACE | sayyidyofa-dev |
-| FLINK_CLIENT_ID | 9e677b2b60b017835bca23b3267cd224.access |
-| FLINK_CLIENT_SECRET | 9f156234b1a72bc0ba68ee25683ff1844b4a5dd1ab29a89f4d647deeefaa5559 |
 | ELASTIC_USERNAME | sayyidyofa |
 | ELASTIC_PASSWORD | Pi@rgen8 |
 | REDIS_URL | redis://default:PZMF7X2Qxxtt3Xet21PbLO3dEP13S1Yx@... |
 | S3_ENDPOINT | https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com |
 | S3_ACCESS_KEY_ID | e6cf9886c1fb510ce1f5afd212cd7c07 |
 | S3_SECRET_ACCESS_KEY | 6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838 |
-| REDPANDA_BROKERS | d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092 |
-| REDPANDA_USERNAME | bongko |
-| REDPANDA_PASSWORD | P@ssw0rd |
+| KAFKA_BROKERS | d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092 |
+| KAFKA_USERNAME | bongko |
+| KAFKA_PASSWORD | P@ssw0rd |
 
 ### Trigger Deploy
 

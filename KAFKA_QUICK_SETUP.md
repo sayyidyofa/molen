@@ -1,4 +1,4 @@
-# Redpanda Integration Quick Setup
+# Kafka Integration Quick Setup
 
 ## Quick Start with Provided Credentials
 
@@ -7,11 +7,11 @@
 Create a `.env` file in the repository root (this file is gitignored):
 
 ```bash
-# Redpanda Broker Configuration
-REDPANDA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
-REDPANDA_USERNAME=bongko
-REDPANDA_PASSWORD=P@ssw0rd
-REDPANDA_SASL_MECHANISM=scram-sha-256
+# Kafka Broker Configuration
+KAFKA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
+KAFKA_USERNAME=bongko
+KAFKA_PASSWORD=P@ssw0rd
+KAFKA_SASL_MECHANISM=scram-sha-256
 
 # Use real client (not mocks)
 USE_MOCKS=false
@@ -20,10 +20,10 @@ USE_MOCKS=false
 Or export environment variables:
 
 ```bash
-export REDPANDA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
-export REDPANDA_USERNAME="bongko"
-export REDPANDA_PASSWORD="P@ssw0rd"
-export REDPANDA_SASL_MECHANISM="scram-sha-256"
+export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
+export KAFKA_USERNAME="bongko"
+export KAFKA_PASSWORD="P@ssw0rd"
+export KAFKA_SASL_MECHANISM="scram-sha-256"
 export USE_MOCKS="false"
 ```
 
@@ -38,13 +38,13 @@ bun install  # or npm install
 
 ```bash
 # From packages/core directory
-bun test tests/integration/redpanda-broker.integration.test.ts
+bun test tests/integration/kafka-broker.integration.test.ts
 ```
 
 Expected output:
 ```
-✓ RealRedpandaBrokerClient Integration
-  ✓ should connect to Redpanda broker
+✓ RealKafkaBrokerClient Integration
+  ✓ should connect to Kafka broker
   ✓ should create a new topic
   ✓ should get topic metadata
   ✓ should produce and consume messages
@@ -62,9 +62,9 @@ Create a file `test-redpanda.ts`:
 ```typescript
 import { ExternalClientFactory } from './packages/core/src/index';
 
-async function testRedpanda() {
-  console.log('🔌 Connecting to Redpanda...');
-  const broker = ExternalClientFactory.createRedpandaBrokerClient();
+async function testKafka() {
+  console.log('🔌 Connecting to Kafka...');
+  const broker = ExternalClientFactory.createKafkaBrokerClient();
   
   try {
     await broker.connect();
@@ -130,7 +130,7 @@ async function testRedpanda() {
   }
 }
 
-testRedpanda();
+testKafka();
 ```
 
 Run with:
@@ -144,10 +144,10 @@ For CI/CD, add these secrets to your GitHub repository (Settings → Secrets and
 
 | Secret Name | Value |
 |-------------|-------|
-| `REDPANDA_BROKERS` | `d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092` |
-| `REDPANDA_USERNAME` | `bongko` |
-| `REDPANDA_PASSWORD` | `P@ssw0rd` |
-| `REDPANDA_SASL_MECHANISM` | `scram-sha-256` |
+| `KAFKA_BROKERS` | `d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092` |
+| `KAFKA_USERNAME` | `bongko` |
+| `KAFKA_PASSWORD` | `P@ssw0rd` |
+| `KAFKA_SASL_MECHANISM` | `scram-sha-256` |
 
 ### 6. Manual Testing with Curl (Example)
 
@@ -214,19 +214,19 @@ Our implementation wraps this in a cleaner interface that works with the Molen f
 
 1. ✅ Integration tests passing
 2. ✅ Can produce/consume messages
-3. 🔄 Integrate with Redpanda Connect for waterfall processing
+3. 🔄 Integrate with Kafka Connect for waterfall processing
 4. 🔄 Connect to fraud detection pipeline
 5. 🔄 Add monitoring and metrics
 
 ## Resources
 
-- [Full Integration Guide](./REDPANDA_INTEGRATION_GUIDE.md)
-- [Integration Tests](./packages/core/tests/integration/redpanda-broker.integration.test.ts)
+- [Full Integration Guide](./KAFKA_INTEGRATION_GUIDE.md)
+- [Integration Tests](./packages/core/tests/integration/kafka-broker.integration.test.ts)
 - [Architecture Documentation](./SELF_SERVICE_ARCHITECTURE.md)
 
 ## Support
 
 Questions? Check:
-1. [Integration Guide](./REDPANDA_INTEGRATION_GUIDE.md) - Comprehensive documentation
-2. [Troubleshooting](./REDPANDA_INTEGRATION_GUIDE.md#troubleshooting) - Common issues
+1. [Integration Guide](./KAFKA_INTEGRATION_GUIDE.md) - Comprehensive documentation
+2. [Troubleshooting](./KAFKA_INTEGRATION_GUIDE.md#troubleshooting) - Common issues
 3. [GitHub Issues](https://github.com/sayyidyofa/molen/issues) - Report problems

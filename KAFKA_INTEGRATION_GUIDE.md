@@ -1,27 +1,27 @@
-# Redpanda Broker Integration Guide
+# Kafka Broker Integration Guide
 
 ## Overview
 
-This guide covers the Redpanda broker integration using the Kafka API (KafkaJS) for message streaming in the Molen fraud detection platform. Redpanda serves as the high-performance message broker for real-time transaction event processing.
+This guide covers the Kafka broker integration using the Kafka API (KafkaJS) for message streaming in the Molen fraud detection platform. Kafka serves as the high-performance message broker for real-time transaction event processing.
 
 ## Architecture
 
-Redpanda replaces LavinMQ as the message broker in Molen's V2.0 architecture:
+Kafka replaces LavinMQ as the message broker in Molen's V2.0 architecture:
 
 ```
-Transaction Events → Redpanda Broker → Redpanda Connect → Fraud Detection Pipeline
+Transaction Events → Kafka Broker → Kafka Connect → Fraud Detection Pipeline
                                     ↓
                            API (produce/consume)
 ```
 
 ## Components
 
-### 1. IRedpandaBrokerClient Interface
+### 1. IKafkaBrokerClient Interface
 
 The main interface for Kafka API operations:
 
 ```typescript
-interface IRedpandaBrokerClient {
+interface IKafkaBrokerClient {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   createTopic(config: TopicConfig): Promise<boolean>;
@@ -34,7 +34,7 @@ interface IRedpandaBrokerClient {
 }
 ```
 
-### 2. RealRedpandaBrokerClient
+### 2. RealKafkaBrokerClient
 
 Production implementation using KafkaJS:
 - **SASL Authentication**: SCRAM-SHA-256 or SCRAM-SHA-512
@@ -43,7 +43,7 @@ Production implementation using KafkaJS:
 - **Producer**: Message publishing with batching support
 - **Consumer**: Message consumption with consumer groups
 
-### 3. MockRedpandaBrokerClient
+### 3. MockKafkaBrokerClient
 
 In-memory implementation for testing:
 - No external dependencies
@@ -56,25 +56,25 @@ In-memory implementation for testing:
 ### Environment Variables
 
 ```bash
-# Redpanda broker endpoints (comma-separated for multiple brokers)
-REDPANDA_BROKERS=broker1:9092,broker2:9092,broker3:9092
+# Kafka broker endpoints (comma-separated for multiple brokers)
+KAFKA_BROKERS=broker1:9092,broker2:9092,broker3:9092
 
 # SASL authentication credentials
-REDPANDA_USERNAME=your-username
-REDPANDA_PASSWORD=your-password
-REDPANDA_SASL_MECHANISM=scram-sha-256  # or scram-sha-512
+KAFKA_USERNAME=your-username
+KAFKA_PASSWORD=your-password
+KAFKA_SASL_MECHANISM=scram-sha-256  # or scram-sha-512
 
 # Optional: Use mocks for testing
 USE_MOCKS=false
 ```
 
-### Redpanda Cloud Example
+### Kafka Cloud Example
 
 ```bash
-REDPANDA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
-REDPANDA_USERNAME=bongko
-REDPANDA_PASSWORD=P@ssw0rd
-REDPANDA_SASL_MECHANISM=scram-sha-256
+KAFKA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
+KAFKA_USERNAME=bongko
+KAFKA_PASSWORD=P@ssw0rd
+KAFKA_SASL_MECHANISM=scram-sha-256
 ```
 
 ## Usage Examples
@@ -85,7 +85,7 @@ REDPANDA_SASL_MECHANISM=scram-sha-256
 import { ExternalClientFactory } from '@molen/core';
 
 // Create client (automatically uses env vars)
-const broker = ExternalClientFactory.createRedpandaBrokerClient();
+const broker = ExternalClientFactory.createKafkaBrokerClient();
 
 // Connect to broker
 await broker.connect();
@@ -175,10 +175,10 @@ await broker.deleteTopic('old-topic');
 ### Using with Mock for Testing
 
 ```typescript
-import { MockRedpandaBrokerClient } from '@molen/core';
+import { MockKafkaBrokerClient } from '@molen/core';
 
 // Create mock client
-const mockBroker = new MockRedpandaBrokerClient({
+const mockBroker = new MockKafkaBrokerClient({
   brokers: ['localhost:9092']
 });
 
@@ -205,7 +205,7 @@ console.log(`Topics: ${mockTopics.length}, Messages: ${mockMessages.length}`);
 import { ExternalClientFactory } from '@molen/core';
 
 // Initialize clients
-const broker = ExternalClientFactory.createRedpandaBrokerClient();
+const broker = ExternalClientFactory.createKafkaBrokerClient();
 const redis = ExternalClientFactory.createRedisClient();
 const elastic = ExternalClientFactory.createElasticClient();
 
@@ -277,11 +277,11 @@ await broker.disconnect();
 
 ```typescript
 import { describe, test, expect } from 'bun:test';
-import { MockRedpandaBrokerClient } from '@molen/core';
+import { MockKafkaBrokerClient } from '@molen/core';
 
 describe('Fraud Event Processing', () => {
   test('should process transaction events', async () => {
-    const broker = new MockRedpandaBrokerClient({ brokers: ['localhost:9092'] });
+    const broker = new MockKafkaBrokerClient({ brokers: ['localhost:9092'] });
     
     await broker.connect();
     await broker.createTopic({ topic: 'transactions' });
@@ -303,18 +303,18 @@ describe('Fraud Event Processing', () => {
 
 ### Integration Tests
 
-Integration tests run against a real Redpanda broker:
+Integration tests run against a real Kafka broker:
 
 ```bash
 # Set credentials
-export REDPANDA_BROKERS="your-broker:9092"
-export REDPANDA_USERNAME="your-username"
-export REDPANDA_PASSWORD="your-password"
-export REDPANDA_SASL_MECHANISM="scram-sha-256"
+export KAFKA_BROKERS="your-broker:9092"
+export KAFKA_USERNAME="your-username"
+export KAFKA_PASSWORD="your-password"
+export KAFKA_SASL_MECHANISM="scram-sha-256"
 
 # Run integration tests
 cd packages/core
-bun test tests/integration/redpanda-broker.integration.test.ts
+bun test tests/integration/kafka-broker.integration.test.ts
 ```
 
 Tests automatically:
@@ -358,14 +358,14 @@ Reuse connections instead of creating new ones:
 ```typescript
 // ❌ Slow - reconnecting each time
 async function processMessage(msg) {
-  const broker = ExternalClientFactory.createRedpandaBrokerClient();
+  const broker = ExternalClientFactory.createKafkaBrokerClient();
   await broker.connect();
   await broker.produce(msg);
   await broker.disconnect();
 }
 
 // ✅ Fast - reuse connection
-const broker = ExternalClientFactory.createRedpandaBrokerClient();
+const broker = ExternalClientFactory.createKafkaBrokerClient();
 await broker.connect();
 
 async function processMessage(msg) {
@@ -380,7 +380,7 @@ await broker.disconnect();
 
 ### SASL Authentication
 
-Redpanda supports multiple SASL mechanisms:
+Kafka supports multiple SASL mechanisms:
 
 - **SCRAM-SHA-256**: Recommended for most deployments
 - **SCRAM-SHA-512**: Higher security, slightly slower
@@ -388,10 +388,10 @@ Redpanda supports multiple SASL mechanisms:
 
 ### SSL/TLS
 
-SSL is enabled by default for cloud deployments. For self-hosted Redpanda:
+SSL is enabled by default for cloud deployments. For self-hosted Kafka:
 
 ```typescript
-const broker = new RealRedpandaBrokerClient({
+const broker = new RealKafkaBrokerClient({
   brokers: ['localhost:9092'],
   ssl: false,  // Disable for local development
   sasl: {
@@ -408,7 +408,7 @@ const broker = new RealRedpandaBrokerClient({
 
 ✅ Use environment variables:
 ```bash
-export REDPANDA_PASSWORD="secret"
+export KAFKA_PASSWORD="secret"
 ```
 
 ✅ Use GitHub Secrets for CI/CD
@@ -466,7 +466,7 @@ Error: Topic already exists
 
 1. **Always disconnect**: Use try/finally to ensure cleanup
    ```typescript
-   const broker = ExternalClientFactory.createRedpandaBrokerClient();
+   const broker = ExternalClientFactory.createKafkaBrokerClient();
    try {
      await broker.connect();
      // ... operations
@@ -517,7 +517,7 @@ Error: Topic already exists
 
 ## References
 
-- [Redpanda Documentation](https://docs.redpanda.com/)
+- [Kafka Documentation](https://docs.redpanda.com/)
 - [KafkaJS Documentation](https://kafka.js.org/)
 - [Molen Architecture Guide](./SELF_SERVICE_ARCHITECTURE.md)
 - [Integration Tests Guide](../packages/core/tests/integration/README.md)
@@ -527,5 +527,5 @@ Error: Topic already exists
 For issues or questions:
 1. Check troubleshooting section above
 2. Review integration test examples
-3. Consult Redpanda documentation
+3. Consult Kafka documentation
 4. Open GitHub issue with details

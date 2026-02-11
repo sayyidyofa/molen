@@ -33,7 +33,6 @@ This guide covers deploying the Molen Self-Service Fraud-Ops Platform to Kuberne
 ### Credentials Needed
 
 You'll need credentials for:
-- Flink (Cloudflare Access)
 - Elasticsearch
 - Redis
 - S3/Cloudflare R2
@@ -50,17 +49,15 @@ export KUBE_SERVICE_TOKEN="<your-service-account-token>"
 export KUBE_NAMESPACE="sayyidyofa-dev"
 
 # Application credentials
-export FLINK_CLIENT_ID="9e677b2b60b017835bca23b3267cd224.access"
-export FLINK_CLIENT_SECRET="9f156234b1a72bc0ba68ee25683ff1844b4a5dd1ab29a89f4d647deeefaa5559"
 export ELASTIC_USERNAME="sayyidyofa"
 export ELASTIC_PASSWORD="Pi@rgen8"
 export REDIS_URL="redis://default:PZMF7X2Qxxtt3Xet21PbLO3dEP13S1Yx@redis-12394.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:12394"
 export S3_ENDPOINT="https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com"
 export S3_ACCESS_KEY_ID="e6cf9886c1fb510ce1f5afd212cd7c07"
 export S3_SECRET_ACCESS_KEY="6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838"
-export REDPANDA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
-export REDPANDA_USERNAME="bongko"
-export REDPANDA_PASSWORD="P@ssw0rd"
+export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
+export KAFKA_USERNAME="bongko"
+export KAFKA_PASSWORD="P@ssw0rd"
 ```
 
 ### 2. Deploy using the script
@@ -140,7 +137,6 @@ Stored in `k8s/configmap.yaml`:
 ### Secrets (Sensitive)
 
 Stored in Kubernetes Secret `molen-secrets`:
-- Flink credentials
 - Elasticsearch credentials
 - Redis connection URL
 - S3/R2 credentials
@@ -187,8 +183,6 @@ kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl appl
 # Or manually
 kubectl create secret generic molen-secrets \
   --namespace=$KUBE_NAMESPACE \
-  --from-literal=FLINK_CLIENT_ID="$FLINK_CLIENT_ID" \
-  --from-literal=FLINK_CLIENT_SECRET="$FLINK_CLIENT_SECRET" \
   # ... (see secret.yaml.template for all fields)
 ```
 
@@ -235,17 +229,15 @@ Add these to your repository Settings → Secrets:
 - `KUBE_NAMESPACE`: sayyidyofa-dev
 
 **Application Credentials:**
-- `FLINK_CLIENT_ID`
-- `FLINK_CLIENT_SECRET`
 - `ELASTIC_USERNAME`
 - `ELASTIC_PASSWORD`
 - `REDIS_URL`
 - `S3_ENDPOINT`
 - `S3_ACCESS_KEY_ID`
 - `S3_SECRET_ACCESS_KEY`
-- `REDPANDA_BROKERS`
-- `REDPANDA_USERNAME`
-- `REDPANDA_PASSWORD`
+- `KAFKA_BROKERS`
+- `KAFKA_USERNAME`
+- `KAFKA_PASSWORD`
 
 #### Trigger Deployment
 
@@ -510,4 +502,4 @@ spec:
 For issues or questions:
 - Check [SELF_SERVICE_ARCHITECTURE.md](../SELF_SERVICE_ARCHITECTURE.md)
 - Review [PROJECT_COMPLETION_REPORT.md](../PROJECT_COMPLETION_REPORT.md)
-- See [REDPANDA_INTEGRATION_GUIDE.md](../REDPANDA_INTEGRATION_GUIDE.md)
+- See [KAFKA_INTEGRATION_GUIDE.md](../KAFKA_INTEGRATION_GUIDE.md)

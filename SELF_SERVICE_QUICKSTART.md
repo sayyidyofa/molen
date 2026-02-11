@@ -8,7 +8,7 @@ Molen is a Self-Service Internal Developer Platform (IDP) that empowers Fraud St
 
 - [Bun](https://bun.sh/) >= 1.0.0
 - Docker and Docker Compose (for local development)
-- Access to Redpanda, Garage S3, Elasticsearch, and Redis
+- Access to Redpanda, S3-compatible storage, Elasticsearch, and Redis
 
 ## Quick Setup
 
@@ -31,8 +31,8 @@ SHADOW_MODE=false
 USE_MOCKS=true
 
 # Redpanda (Message Broker)
-REDPANDA_BROKER_URL=localhost:9092
-REDPANDA_CONNECT_URL=http://localhost:4195
+KAFKA_BROKER_URL=localhost:9092
+KAFKA_CONNECT_URL=http://localhost:4195
 
 # Storage
 GARAGE_ENDPOINT=https://garage.internal:3900
@@ -186,7 +186,7 @@ If the False Positive rate improved:
 1. Click **Promote to Live** button
 2. Confirm promotion
 3. Old live model is automatically archived
-4. Redpanda Connect pipeline reloads with new model
+4. Kafka Connect pipeline reloads with new model
 
 **API Alternative:**
 ```bash
@@ -233,7 +233,7 @@ Recommended:
 1. Navigate to **Rule Editor**
 2. Modify thresholds (e.g., high amount check)
 3. Click **Publish**
-4. Redpanda Connect pipeline automatically reloads
+4. Kafka Connect pipeline automatically reloads
 
 **API Alternative:**
 ```bash
@@ -244,7 +244,7 @@ curl -X PUT http://localhost:3000/rules/{ruleId} \
     "scoreWeight": 25
   }'
 
-# Publish changes (reloads Redpanda Connect)
+# Publish changes (reloads Kafka Connect)
 curl -X POST http://localhost:3000/rules/publish
 ```
 
@@ -291,7 +291,7 @@ USE_MOCKS=true
 **What's Mocked:**
 - ✅ ML Training (instant completion)
 - ✅ Model storage (in-memory)
-- ✅ Redpanda Connect (in-memory pipelines)
+- ✅ Kafka Connect (in-memory pipelines)
 - ✅ Elasticsearch (in-memory store)
 - ✅ Redis (in-memory cache)
 - ✅ S3/Garage (in-memory blobs)
@@ -368,12 +368,12 @@ curl -X DELETE http://localhost:3000/ml/training/{jobId}
 - **Topic:** `transactions`
 - **Performance:** 10M+ msgs/sec
 
-### Redpanda Connect (Waterfall Engine)
+### Kafka Connect (Waterfall Engine)
 - **Purpose:** Stream processing pipeline
 - **Configuration:** YAML-based
 - **Reload:** Dynamic without downtime
 
-### Garage S3 (Training Data)
+### S3-compatible storage (Training Data)
 - **Purpose:** Store Parquet training datasets
 - **Bucket:** `training-data`
 - **Format:** Parquet (columnar, optimized)
@@ -440,10 +440,10 @@ curl -X POST "http://localhost:9200/evaluation-logs/_search" \
   }'
 ```
 
-### Redpanda Connect pipeline not reloading
+### Kafka Connect pipeline not reloading
 
 ```bash
-# Check Redpanda Connect status
+# Check Kafka Connect status
 curl http://localhost:4195/ready
 
 # Manual reload

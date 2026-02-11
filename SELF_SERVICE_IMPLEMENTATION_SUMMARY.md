@@ -2,16 +2,14 @@
 
 ## Overview
 
-This document summarizes the complete implementation of the architectural pivot from a static Flink-based fraud detection system to a Self-Service Internal Developer Platform (IDP) for Fraud Strategy Analysts.
 
 ## What Was Implemented
 
 ### 1. Core Infrastructure (Interfaces & Clients)
 
-#### Redpanda Connect Client
+#### Kafka Connect Client
 **File:** `packages/core/src/clients/redpanda.interface.ts`
 
-Interface for managing Redpanda Connect pipelines (replaces Apache Flink):
 - `deployPipeline()` - Deploy or update YAML pipeline configuration
 - `getPipelineStatus()` - Monitor pipeline health
 - `reloadPipeline()` - Dynamically reload after rule changes
@@ -95,7 +93,7 @@ RESTful API endpoints:
 Added two new factory methods:
 
 ```typescript
-static createRedpandaConnectClient(): IRedpandaConnectClient {
+static createKafkaConnectClient(): IKafkaConnectClient {
   if (process.env.USE_MOCKS === 'true') {
     return new MockRedpandaConnectClient({...});
   }
@@ -119,7 +117,7 @@ Both follow existing Interface Factory Pattern with environment-based switching.
 **File:** `packages/core/src/index.ts`
 
 New exports added:
-- `IRedpandaConnectClient`, `RedpandaConnectConfig`, `PipelineConfig`, `PipelineStatus`
+- `IKafkaConnectClient`, `RedpandaConnectConfig`, `PipelineConfig`, `PipelineStatus`
 - `IMLTrainer`, `TrainingConfig`, `TrainingJob`, `ModelVersion`, `ModelComparison`
 - `MockRedpandaConnectClient`
 - `MockMLTrainer`
@@ -132,11 +130,11 @@ New environment variables:
 
 ```env
 # Redpanda (replaces LavinMQ)
-REDPANDA_BROKER_URL=localhost:9092
-REDPANDA_CONNECT_URL=http://localhost:4195
-REDPANDA_CONNECT_API_KEY=
+KAFKA_BROKER_URL=localhost:9092
+KAFKA_CONNECT_URL=http://localhost:4195
+KAFKA_CONNECT_API_KEY=
 
-# Garage S3 (Training Data)
+# S3-compatible storage (Training Data)
 GARAGE_ENDPOINT=
 GARAGE_ACCESS_KEY_ID=
 GARAGE_SECRET_ACCESS_KEY=
@@ -151,7 +149,7 @@ Updated main API server:
 - Imported MLService and mlRoutes
 - Registered ML routes: `app.use(mlRoutes)`
 - Updated welcome message to reflect "Self-Service IDP"
-- Added Redpanda Connect URL to startup logs
+- Added Kafka Connect URL to startup logs
 
 ### 8. Comprehensive Documentation
 
@@ -230,7 +228,7 @@ Complete rewrite for V2.0:
 ### REQ-3: Declarative Rule Management ✅
 
 **Implementation:**
-- IRedpandaConnectClient for pipeline management
+- IKafkaConnectClient for pipeline management
 - YAML-based pipeline configuration
 - Dynamic pipeline reload without downtime
 - Rule changes trigger `reloadPipeline()`
@@ -239,7 +237,7 @@ Complete rewrite for V2.0:
 1. Analyst updates rule threshold in UI
 2. PUT request to `/rules/:ruleId`
 3. Publish triggers `POST /rules/publish`
-4. Redpanda Connect pipeline reloads
+4. Kafka Connect pipeline reloads
 5. New rules active immediately
 
 ### REQ-4: Alert Triage & Audit ✅
@@ -265,13 +263,12 @@ Complete rewrite for V2.0:
 
 ### Before (V1)
 - Message Broker: LavinMQ
-- Stream Processing: Apache Flink (hard-coded)
 - Model Deployment: Manual, static
 - Configuration: Code changes required
 
 ### After (V2)
 - Message Broker: Redpanda (10x faster)
-- Stream Processing: Redpanda Connect (YAML declarative)
+- Stream Processing: Kafka Connect (YAML declarative)
 - Model Training: Self-service via UI
 - Model Deployment: Shadow → Promote workflow
 - Configuration: Dynamic YAML reload
@@ -349,7 +346,7 @@ Complete rewrite for V2.0:
 
 ### Currently Implemented: Mocks Only
 
-Both Redpanda Connect and ML Trainer have **mock implementations only**. This allows:
+Both Kafka Connect and ML Trainer have **mock implementations only**. This allows:
 - ✅ Full testing without external dependencies
 - ✅ Local development with `USE_MOCKS=true`
 - ✅ API contract validation
@@ -358,7 +355,7 @@ Both Redpanda Connect and ML Trainer have **mock implementations only**. This al
 ### Real Implementations: Next Phase
 
 **RedpandaConnectClient (Real):**
-- HTTP client to Redpanda Connect REST API
+- HTTP client to Kafka Connect REST API
 - YAML configuration management
 - Pipeline status monitoring
 - Dynamic reload mechanism
@@ -378,7 +375,7 @@ Both Redpanda Connect and ML Trainer have **mock implementations only**. This al
 - [ ] UI components for model training dashboard
 - [ ] UI components for model comparison
 - [ ] UI components for model promotion
-- [ ] Real Redpanda Connect client implementation
+- [ ] Real Kafka Connect client implementation
 - [ ] Real ML Trainer client implementation
 
 ### Short-term (Next Sprint)
@@ -400,7 +397,7 @@ Both Redpanda Connect and ML Trainer have **mock implementations only**. This al
 ### Functional Requirements ✅
 - ✅ REQ-1: Self-service training interface complete
 - ✅ REQ-2: Shadow mode with candidate models
-- ✅ REQ-3: Declarative rule management via Redpanda Connect
+- ✅ REQ-3: Declarative rule management via Kafka Connect
 - ✅ REQ-4: Audit trail with model versioning
 
 ### Non-Functional Requirements ✅
@@ -451,12 +448,12 @@ The Molen platform has successfully pivoted from a static fraud detection system
 
 **Architecture Benefits:**
 - Redpanda: 10x LavinMQ throughput
-- Redpanda Connect: Declarative YAML (no code changes)
+- Kafka Connect: Declarative YAML (no code changes)
 - Mock implementations: Full local development
 - Interface Factory: Clean architecture, testable
 
 **Next Phase:**
-- Implement real clients (Redpanda Connect, ML Trainer)
+- Implement real clients (Kafka Connect, ML Trainer)
 - Build UI components
 - Add integration tests
 - Deploy to staging environment
