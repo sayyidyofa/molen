@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: molen-ui
+  namespace: molen
+  labels:
+    app: molen-ui
+    component: frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: molen-ui
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  sessionAffinity: None

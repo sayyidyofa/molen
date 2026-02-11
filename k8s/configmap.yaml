@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: molen-config
+  namespace: molen
+data:
+  # Application configuration (non-sensitive)
+  NODE_ENV: "production"
+  API_PORT: "3000"
+  UI_PORT: "8080"
+  
+  # Feature flags
+  USE_MOCKS: "false"
+  SHADOW_MODE_ENABLED: "true"
+  
+  # Service URLs (non-sensitive parts)
+  FLINK_URL: "https://flink.bongko.id"
+  ELASTIC_URL: "https://elastic.bongko.id/"
+  
+  # S3/R2 configuration
+  S3_BUCKET: "ml-models"
+  S3_REGION: "auto"
+  
+  # Redpanda configuration
+  REDPANDA_SASL_MECHANISM: "scram-sha-256"
+  
+  # Logging
+  LOG_LEVEL: "info"

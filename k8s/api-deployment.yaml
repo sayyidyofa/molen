@@ -1,0 +1,177 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: molen-api
+  namespace: molen
+  labels:
+    app: molen-api
+    component: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: molen-api
+  template:
+    metadata:
+      labels:
+        app: molen-api
+        component: backend
+        version: v2.0
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/sayyidyofa/molen-api:latest
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        env:
+        # From ConfigMap
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: NODE_ENV
+        - name: API_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: API_PORT
+        - name: USE_MOCKS
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: USE_MOCKS
+        - name: SHADOW_MODE_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: SHADOW_MODE_ENABLED
+        - name: FLINK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: FLINK_URL
+        - name: ELASTIC_URL
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: ELASTIC_URL
+        - name: S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: S3_BUCKET
+        - name: S3_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: S3_REGION
+        - name: REDPANDA_SASL_MECHANISM
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: REDPANDA_SASL_MECHANISM
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: molen-config
+              key: LOG_LEVEL
+        
+        # From Secrets
+        - name: FLINK_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: FLINK_CLIENT_ID
+        - name: FLINK_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: FLINK_CLIENT_SECRET
+        - name: ELASTIC_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: ELASTIC_USERNAME
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: ELASTIC_PASSWORD
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: REDIS_URL
+        - name: S3_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: S3_ENDPOINT
+        - name: S3_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: S3_ACCESS_KEY_ID
+        - name: S3_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: S3_SECRET_ACCESS_KEY
+        - name: REDPANDA_BROKERS
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: REDPANDA_BROKERS
+        - name: REDPANDA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: REDPANDA_USERNAME
+        - name: REDPANDA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: molen-secrets
+              key: REDPANDA_PASSWORD
+        
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+      
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
