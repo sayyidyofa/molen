@@ -47,3 +47,6 @@ export { Transaction, RuleEvaluationResult } from './types/transaction.types';
 // Factories
 export { ExternalClientFactory } from './factories/client.factory';
 export { RuleEvaluatorFactory, type RuleEvaluatorConfig } from './factories/rule-evaluator.factory';
+
+// Auth module
+export * from './auth';

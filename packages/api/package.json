@@ -13,6 +13,8 @@
   "dependencies": {
     "elysia": "^0.8.14",
     "@elysiajs/cors": "^0.8.0",
+    "@elysiajs/jwt": "^0.8.0",
+    "@elysiajs/bearer": "^0.8.0",
     "@molen/core": "workspace:*"
   },
   "devDependencies": {
