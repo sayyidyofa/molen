@@ -10,6 +10,10 @@ import { MockFlinkClient } from '../clients/flink.mock';
 import { IS3Client } from '../clients/s3.interface';
 import { RealS3Client } from '../clients/s3.real';
 import { MockS3Client } from '../clients/s3.mock';
+import { IRedpandaConnectClient } from '../clients/redpanda.interface';
+import { MockRedpandaConnectClient } from '../clients/redpanda.mock';
+import { IMLTrainer } from '../clients/mltrainer.interface';
+import { MockMLTrainer } from '../clients/mltrainer.mock';
 
 /**
  * Factory for creating external service clients with environment-based switching
@@ -88,5 +92,37 @@ export class ExternalClientFactory {
       bucket,
       region,
     });
+  }
+
+  /**
+   * Create a Redpanda Connect client for pipeline management
+   * Uses mock implementation when USE_MOCKS=true
+   * Replaces direct Flink integration for flexible waterfall processing
+   */
+  static createRedpandaConnectClient(): IRedpandaConnectClient {
+    if (process.env.USE_MOCKS === 'true') {
+      return new MockRedpandaConnectClient({ apiUrl: 'http://localhost:4195' });
+    }
+
+    const apiUrl = process.env.REDPANDA_CONNECT_URL || 'http://localhost:4195';
+    const apiKey = process.env.REDPANDA_CONNECT_API_KEY;
+
+    // Real implementation will be added later
+    // For now, return mock even in production until real client is implemented
+    return new MockRedpandaConnectClient({ apiUrl, apiKey });
+  }
+
+  /**
+   * Create an ML Trainer client for self-service model training
+   * Uses mock implementation when USE_MOCKS=true
+   */
+  static createMLTrainer(): IMLTrainer {
+    if (process.env.USE_MOCKS === 'true') {
+      return new MockMLTrainer();
+    }
+
+    // Real implementation will be added later
+    // For now, return mock even in production until real client is implemented
+    return new MockMLTrainer();
   }
 }
