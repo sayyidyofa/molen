@@ -1,9 +1,9 @@
 /**
- * Redpanda Broker client interface
- * Direct Kafka API access to Redpanda broker for message streaming
+ * Kafka Broker client interface
+ * Direct Kafka API access to Kafka broker for message streaming
  */
 
-export interface RedpandaBrokerConfig {
+export interface KafkaBrokerConfig {
   brokers: string[];
   ssl?: boolean;
   sasl?: {
@@ -43,10 +43,10 @@ export interface TopicMetadata {
 }
 
 /**
- * IRedpandaBrokerClient - Interface for Redpanda broker operations
+ * IKafkaBrokerClient - Interface for Kafka broker operations
  * Uses Kafka protocol for message streaming
  */
-export interface IRedpandaBrokerClient {
+export interface IKafkaBrokerClient {
   /**
    * Connect to the broker
    */

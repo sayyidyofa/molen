@@ -53,11 +53,9 @@ spec:
             configMapKeyRef:
               name: molen-config
               key: SHADOW_MODE_ENABLED
-        - name: FLINK_URL
           valueFrom:
             configMapKeyRef:
               name: molen-config
-              key: FLINK_URL
         - name: ELASTIC_URL
           valueFrom:
             configMapKeyRef:
@@ -73,11 +71,11 @@ spec:
             configMapKeyRef:
               name: molen-config
               key: S3_REGION
-        - name: REDPANDA_SASL_MECHANISM
+        - name: KAFKA_SASL_MECHANISM
           valueFrom:
             configMapKeyRef:
               name: molen-config
-              key: REDPANDA_SASL_MECHANISM
+              key: KAFKA_SASL_MECHANISM
         - name: LOG_LEVEL
           valueFrom:
             configMapKeyRef:
@@ -85,16 +83,12 @@ spec:
               key: LOG_LEVEL
         
         # From Secrets
-        - name: FLINK_CLIENT_ID
           valueFrom:
             secretKeyRef:
               name: molen-secrets
-              key: FLINK_CLIENT_ID
-        - name: FLINK_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               name: molen-secrets
-              key: FLINK_CLIENT_SECRET
         - name: ELASTIC_USERNAME
           valueFrom:
             secretKeyRef:
@@ -125,21 +119,21 @@ spec:
             secretKeyRef:
               name: molen-secrets
               key: S3_SECRET_ACCESS_KEY
-        - name: REDPANDA_BROKERS
+        - name: KAFKA_BROKERS
           valueFrom:
             secretKeyRef:
               name: molen-secrets
-              key: REDPANDA_BROKERS
-        - name: REDPANDA_USERNAME
+              key: KAFKA_BROKERS
+        - name: KAFKA_USERNAME
           valueFrom:
             secretKeyRef:
               name: molen-secrets
-              key: REDPANDA_USERNAME
-        - name: REDPANDA_PASSWORD
+              key: KAFKA_USERNAME
+        - name: KAFKA_PASSWORD
           valueFrom:
             secretKeyRef:
               name: molen-secrets
-              key: REDPANDA_PASSWORD
+              key: KAFKA_PASSWORD
         
         resources:
           requests:

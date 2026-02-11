@@ -1,9 +1,9 @@
 /**
- * Redpanda Connect client interface
- * Manages Redpanda Connect pipelines for the waterfall engine
+ * Kafka Connect client interface
+ * Manages Kafka Connect pipelines for the waterfall engine
  */
 
-export interface RedpandaConnectConfig {
+export interface KafkaConnectConfig {
   apiUrl: string;
   apiKey?: string;
 }
@@ -23,10 +23,10 @@ export interface PipelineStatus {
 }
 
 /**
- * IRedpandaConnectClient - Interface for Redpanda Connect operations
+ * IKafkaConnectClient - Interface for Kafka Connect operations
  * Replaces direct Flink integration for flexible waterfall processing
  */
-export interface IRedpandaConnectClient {
+export interface IKafkaConnectClient {
   /**
    * Deploy or update a pipeline configuration
    */

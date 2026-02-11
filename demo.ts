@@ -24,7 +24,7 @@ async function main() {
   const elasticClient = ExternalClientFactory.createElasticClient();
   const redisClient = ExternalClientFactory.createRedisClient();
   const s3Client = ExternalClientFactory.createS3Client();
-  const redpandaBroker = ExternalClientFactory.createRedpandaBrokerClient();
+  const redpandaBroker = ExternalClientFactory.createKafkaBrokerClient();
   const mlTrainer = ExternalClientFactory.createMLTrainer();
   console.log('   ✓ Elasticsearch client (Alerts & Analytics)');
   console.log('   ✓ Redis client (Velocity State)');
@@ -41,7 +41,7 @@ async function main() {
     numPartitions: 3,
     replicationFactor: -1,
   });
-  console.log('   ✓ Connected to Redpanda broker');
+  console.log('   ✓ Connected to Kafka broker');
   console.log('   ✓ Created topic: fraud-events (3 partitions)\n');
 
   // 3. ML Training: The "Molen Path"

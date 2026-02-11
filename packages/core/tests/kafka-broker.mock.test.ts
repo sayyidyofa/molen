@@ -1,11 +1,11 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { MockRedpandaBrokerClient } from '../src/clients/redpanda-broker.mock';
+import { MockKafkaBrokerClient } from '../src/clients/kafka-broker.mock';
 
-describe('MockRedpandaBrokerClient', () => {
-  let client: MockRedpandaBrokerClient;
+describe('MockKafkaBrokerClient', () => {
+  let client: MockKafkaBrokerClient;
 
   beforeEach(() => {
-    client = new MockRedpandaBrokerClient({
+    client = new MockKafkaBrokerClient({
       brokers: ['localhost:9092'],
     });
   });

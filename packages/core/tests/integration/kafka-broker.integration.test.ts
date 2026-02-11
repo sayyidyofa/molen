@@ -1,28 +1,28 @@
 import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
-import { RealRedpandaBrokerClient } from '../../src/clients/redpanda-broker.real';
+import { RealKafkaBrokerClient } from '../../src/clients/kafka-broker.real';
 
 // Integration tests only run when credentials are provided
-const REDPANDA_BROKERS = process.env.REDPANDA_BROKERS;
-const REDPANDA_USERNAME = process.env.REDPANDA_USERNAME;
-const REDPANDA_PASSWORD = process.env.REDPANDA_PASSWORD;
-const REDPANDA_SASL_MECHANISM = process.env.REDPANDA_SASL_MECHANISM as 'scram-sha-256' | 'scram-sha-512' | undefined;
+const KAFKA_BROKERS = process.env.KAFKA_BROKERS;
+const KAFKA_USERNAME = process.env.KAFKA_USERNAME;
+const KAFKA_PASSWORD = process.env.KAFKA_PASSWORD;
+const KAFKA_SASL_MECHANISM = process.env.KAFKA_SASL_MECHANISM as 'scram-sha-256' | 'scram-sha-512' | undefined;
 
-const shouldRun = !!(REDPANDA_BROKERS && REDPANDA_USERNAME && REDPANDA_PASSWORD);
+const shouldRun = !!(KAFKA_BROKERS && KAFKA_USERNAME && KAFKA_PASSWORD);
 
-describe.skipIf(!shouldRun)('RealRedpandaBrokerClient Integration', () => {
-  let client: RealRedpandaBrokerClient;
+describe.skipIf(!shouldRun)('RealKafkaBrokerClient Integration', () => {
+  let client: RealKafkaBrokerClient;
   const testTopicPrefix = 'molen-integration-test';
   const testTopic = `${testTopicPrefix}-${Date.now()}`;
   const testGroupId = `molen-test-consumer-${Date.now()}`;
 
   beforeAll(async () => {
-    client = new RealRedpandaBrokerClient({
-      brokers: REDPANDA_BROKERS!.split(','),
+    client = new RealKafkaBrokerClient({
+      brokers: KAFKA_BROKERS!.split(','),
       ssl: true,
       sasl: {
-        mechanism: REDPANDA_SASL_MECHANISM || 'scram-sha-256',
-        username: REDPANDA_USERNAME!,
-        password: REDPANDA_PASSWORD!,
+        mechanism: KAFKA_SASL_MECHANISM || 'scram-sha-256',
+        username: KAFKA_USERNAME!,
+        password: KAFKA_PASSWORD!,
       },
     });
 
@@ -41,7 +41,7 @@ describe.skipIf(!shouldRun)('RealRedpandaBrokerClient Integration', () => {
     }
   });
 
-  test('should connect to Redpanda broker', async () => {
+  test('should connect to Kafka broker', async () => {
     // Connection happens in beforeAll, just verify we can list topics
     const topics = await client.listTopics();
     expect(Array.isArray(topics)).toBe(true);
@@ -149,5 +149,5 @@ describe.skipIf(!shouldRun)('RealRedpandaBrokerClient Integration', () => {
 });
 
 if (!shouldRun) {
-  console.log('⚠️  Redpanda broker integration tests skipped. Set REDPANDA_BROKERS, REDPANDA_USERNAME, and REDPANDA_PASSWORD to run.');
+  console.log('⚠️  Kafka broker integration tests skipped. Set KAFKA_BROKERS, KAFKA_USERNAME, and KAFKA_PASSWORD to run.');
 }

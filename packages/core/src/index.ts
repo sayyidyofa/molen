@@ -1,22 +1,21 @@
 // Client interfaces
 export { IElasticClient } from './clients/elastic.interface';
 export { IRedisClient } from './clients/redis.interface';
-export { IFlinkClient } from './clients/flink.interface';
 export { IS3Client, S3Config, ModelMetadata } from './clients/s3.interface';
 export {
-  IRedpandaConnectClient,
-  RedpandaConnectConfig,
+  IKafkaConnectClient,
+  KafkaConnectConfig,
   PipelineConfig,
   PipelineStatus,
-} from './clients/redpanda.interface';
+} from './clients/kafka.interface';
 export {
-  IRedpandaBrokerClient,
-  RedpandaBrokerConfig,
+  IKafkaBrokerClient,
+  KafkaBrokerConfig,
   TopicConfig,
   ProducerMessage,
   ConsumerMessage,
   TopicMetadata,
-} from './clients/redpanda-broker.interface';
+} from './clients/kafka-broker.interface';
 export {
   IMLTrainer,
   TrainingConfig,
@@ -30,13 +29,11 @@ export { RealElasticClient } from './clients/elastic.real';
 export { MockElasticClient } from './clients/elastic.mock';
 export { RealRedisClient } from './clients/redis.real';
 export { MockRedisClient } from './clients/redis.mock';
-export { RealFlinkClient } from './clients/flink.real';
-export { MockFlinkClient } from './clients/flink.mock';
 export { RealS3Client } from './clients/s3.real';
 export { MockS3Client } from './clients/s3.mock';
-export { MockRedpandaConnectClient } from './clients/redpanda.mock';
-export { RealRedpandaBrokerClient } from './clients/redpanda-broker.real';
-export { MockRedpandaBrokerClient } from './clients/redpanda-broker.mock';
+export { MockKafkaConnectClient } from './clients/kafka.mock';
+export { RealKafkaBrokerClient } from './clients/kafka-broker.real';
+export { MockKafkaBrokerClient } from './clients/kafka-broker.mock';
 export { MockMLTrainer } from './clients/mltrainer.mock';
 
 // Rule evaluator interfaces

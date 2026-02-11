@@ -1,12 +1,12 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { MockRedpandaConnectClient } from '../src/clients/redpanda.mock';
+import { MockKafkaConnectClient } from '../src/clients/kafka.mock';
 import type { PipelineConfig } from '../src/clients/redpanda.interface';
 
-describe('MockRedpandaConnectClient', () => {
-  let client: MockRedpandaConnectClient;
+describe('MockKafkaConnectClient', () => {
+  let client: MockKafkaConnectClient;
 
   beforeEach(() => {
-    client = new MockRedpandaConnectClient({ apiUrl: 'http://localhost:4195' });
+    client = new MockKafkaConnectClient({ apiUrl: 'http://localhost:4195' });
     client.clearMockData();
   });
 

@@ -1,21 +1,21 @@
 import {
-  IRedpandaBrokerClient,
-  RedpandaBrokerConfig,
+  IKafkaBrokerClient,
+  KafkaBrokerConfig,
   TopicConfig,
   ProducerMessage,
   ConsumerMessage,
   TopicMetadata,
-} from './redpanda-broker.interface';
+} from './kafka-broker.interface';
 
 /**
  * Mock implementation of Redpanda broker client for testing
  */
-export class MockRedpandaBrokerClient implements IRedpandaBrokerClient {
+export class MockKafkaBrokerClient implements IKafkaBrokerClient {
   private topics: Map<string, TopicConfig> = new Map();
   private messages: Map<string, ConsumerMessage[]> = new Map();
   private connected: boolean = false;
 
-  constructor(_config: RedpandaBrokerConfig) {
+  constructor(_config: KafkaBrokerConfig) {
     // Mock constructor - no actual connection
   }
 

@@ -42,9 +42,9 @@ jobs:
           ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
           
           # Flink credentials with Cloudflare Access
-          FLINK_URL: ${{ secrets.FLINK_URL }}
-          FLINK_CLIENT_ID: ${{ secrets.FLINK_CLIENT_ID }}
-          FLINK_CLIENT_SECRET: ${{ secrets.FLINK_CLIENT_SECRET }}
+          # FLINK_URL: ${{ secrets.# FLINK_URL }}
+          # FLINK_CLIENT_ID: ${{ secrets.# FLINK_CLIENT_ID }}
+          # FLINK_CLIENT_SECRET: ${{ secrets.# FLINK_CLIENT_SECRET }}
           
           # Redis connection string
           REDIS_URL: ${{ secrets.REDIS_URL }}
@@ -56,10 +56,10 @@ jobs:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           
           # Redpanda broker (Kafka API)
-          REDPANDA_BROKERS: ${{ secrets.REDPANDA_BROKERS }}
-          REDPANDA_USERNAME: ${{ secrets.REDPANDA_USERNAME }}
-          REDPANDA_PASSWORD: ${{ secrets.REDPANDA_PASSWORD }}
-          REDPANDA_SASL_MECHANISM: ${{ secrets.REDPANDA_SASL_MECHANISM }}
+          KAFKA_BROKERS: ${{ secrets.KAFKA_BROKERS }}
+          KAFKA_USERNAME: ${{ secrets.KAFKA_USERNAME }}
+          KAFKA_PASSWORD: ${{ secrets.KAFKA_PASSWORD }}
+          KAFKA_SASL_MECHANISM: ${{ secrets.KAFKA_SASL_MECHANISM }}
         run: |
           cd packages/core
           bun test tests/integration

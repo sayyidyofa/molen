@@ -1,18 +1,18 @@
 import {
-  IRedpandaConnectClient,
+  IKafkaConnectClient,
   PipelineConfig,
   PipelineStatus,
-  RedpandaConnectConfig,
-} from './redpanda.interface';
+  KafkaConnectConfig,
+} from './kafka.interface';
 
 /**
  * Mock implementation of Redpanda Connect client for testing
  */
-export class MockRedpandaConnectClient implements IRedpandaConnectClient {
+export class MockKafkaConnectClient implements IKafkaConnectClient {
   private pipelines: Map<string, PipelineConfig> = new Map();
   private statuses: Map<string, PipelineStatus> = new Map();
 
-  constructor(_config: RedpandaConnectConfig) {
+  constructor(_config: KafkaConnectConfig) {
     // Mock constructor - no actual connection
   }
 

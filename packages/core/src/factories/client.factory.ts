@@ -4,17 +4,14 @@ import { MockElasticClient } from '../clients/elastic.mock';
 import { IRedisClient } from '../clients/redis.interface';
 import { RealRedisClient } from '../clients/redis.real';
 import { MockRedisClient } from '../clients/redis.mock';
-import { IFlinkClient } from '../clients/flink.interface';
-import { RealFlinkClient } from '../clients/flink.real';
-import { MockFlinkClient } from '../clients/flink.mock';
 import { IS3Client } from '../clients/s3.interface';
 import { RealS3Client } from '../clients/s3.real';
 import { MockS3Client } from '../clients/s3.mock';
-import { IRedpandaConnectClient } from '../clients/redpanda.interface';
-import { MockRedpandaConnectClient } from '../clients/redpanda.mock';
-import { IRedpandaBrokerClient } from '../clients/redpanda-broker.interface';
-import { RealRedpandaBrokerClient } from '../clients/redpanda-broker.real';
-import { MockRedpandaBrokerClient } from '../clients/redpanda-broker.mock';
+import { IKafkaConnectClient } from '../clients/kafka.interface';
+import { MockKafkaConnectClient } from '../clients/kafka.mock';
+import { IKafkaBrokerClient } from '../clients/kafka-broker.interface';
+import { RealKafkaBrokerClient } from '../clients/kafka-broker.real';
+import { MockKafkaBrokerClient } from '../clients/kafka-broker.mock';
 import { IMLTrainer } from '../clients/mltrainer.interface';
 import { MockMLTrainer } from '../clients/mltrainer.mock';
 
@@ -54,19 +51,7 @@ export class ExternalClientFactory {
     return new RealRedisClient({ host, port });
   }
 
-  /**
-   * Create a Flink client
-   * Uses mock implementation when USE_MOCKS=true
-   */
-  static createFlinkClient(): IFlinkClient {
-    if (process.env.USE_MOCKS === 'true') {
-      return new MockFlinkClient();
-    }
 
-    const apiUrl = process.env.FLINK_API_URL || 'http://localhost:8081';
-    
-    return new RealFlinkClient({ apiUrl });
-  }
 
   /**
    * Create an S3 client for ML model storage
@@ -98,45 +83,45 @@ export class ExternalClientFactory {
   }
 
   /**
-   * Create a Redpanda Connect client for pipeline management
+   * Create a Kafka Connect client for pipeline management
    * Uses mock implementation when USE_MOCKS=true
-   * Replaces direct Flink integration for flexible waterfall processing
+   * Provides flexible waterfall processing via Kafka Connect
    */
-  static createRedpandaConnectClient(): IRedpandaConnectClient {
+  static createKafkaConnectClient(): IKafkaConnectClient {
     if (process.env.USE_MOCKS === 'true') {
-      return new MockRedpandaConnectClient({ apiUrl: 'http://localhost:4195' });
+      return new MockKafkaConnectClient({ apiUrl: 'http://localhost:4195' });
     }
 
-    const apiUrl = process.env.REDPANDA_CONNECT_URL || 'http://localhost:4195';
-    const apiKey = process.env.REDPANDA_CONNECT_API_KEY;
+    const apiUrl = process.env.KAFKA_CONNECT_URL || 'http://localhost:4195';
+    const apiKey = process.env.KAFKA_CONNECT_API_KEY;
 
     // Real implementation will be added later
     // For now, return mock even in production until real client is implemented
-    return new MockRedpandaConnectClient({ apiUrl, apiKey });
+    return new MockKafkaConnectClient({ apiUrl, apiKey });
   }
 
   /**
-   * Create a Redpanda broker client for Kafka API access
+   * Create a Kafka broker client for Kafka API access
    * Uses mock implementation when USE_MOCKS=true
-   * Provides direct access to Redpanda message streaming
+   * Provides direct access to Kafka message streaming (compatible with Kafka, Redpanda, etc.)
    */
-  static createRedpandaBrokerClient(): IRedpandaBrokerClient {
+  static createKafkaBrokerClient(): IKafkaBrokerClient {
     if (process.env.USE_MOCKS === 'true') {
-      return new MockRedpandaBrokerClient({
+      return new MockKafkaBrokerClient({
         brokers: ['localhost:9092'],
       });
     }
 
-    const brokers = (process.env.REDPANDA_BROKERS || 'localhost:9092').split(',');
-    const username = process.env.REDPANDA_USERNAME;
-    const password = process.env.REDPANDA_PASSWORD;
-    const saslMechanism = process.env.REDPANDA_SASL_MECHANISM as 'plain' | 'scram-sha-256' | 'scram-sha-512' | undefined;
+    const brokers = (process.env.KAFKA_BROKERS || 'localhost:9092').split(',');
+    const username = process.env.KAFKA_USERNAME;
+    const password = process.env.KAFKA_PASSWORD;
+    const saslMechanism = process.env.KAFKA_SASL_MECHANISM as 'plain' | 'scram-sha-256' | 'scram-sha-512' | undefined;
 
     if (!username || !password) {
-      throw new Error('Redpanda credentials not provided. Set REDPANDA_USERNAME and REDPANDA_PASSWORD environment variables.');
+      throw new Error('Kafka credentials not provided. Set KAFKA_USERNAME and KAFKA_PASSWORD environment variables.');
     }
 
-    return new RealRedpandaBrokerClient({
+    return new RealKafkaBrokerClient({
       brokers,
       ssl: true,
       sasl: {

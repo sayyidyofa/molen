@@ -1,24 +1,24 @@
 import { Kafka, Admin, Producer, Consumer } from 'kafkajs';
 import {
-  IRedpandaBrokerClient,
-  RedpandaBrokerConfig,
+  IKafkaBrokerClient,
+  KafkaBrokerConfig,
   TopicConfig,
   ProducerMessage,
   ConsumerMessage,
   TopicMetadata,
-} from './redpanda-broker.interface';
+} from './kafka-broker.interface';
 
 /**
- * Real Redpanda broker client using KafkaJS
- * Connects to Redpanda broker using Kafka protocol with SASL authentication
+ * Real Kafka broker client using KafkaJS
+ * Connects to Kafka broker using Kafka protocol with SASL authentication
  */
-export class RealRedpandaBrokerClient implements IRedpandaBrokerClient {
+export class RealKafkaBrokerClient implements IKafkaBrokerClient {
   private kafka: Kafka;
   private admin: Admin;
   private producer: Producer;
   private consumers: Map<string, Consumer> = new Map();
 
-  constructor(config: RedpandaBrokerConfig) {
+  constructor(config: KafkaBrokerConfig) {
     // Create Kafka instance with Redpanda configuration
     this.kafka = new Kafka({
       brokers: config.brokers,
