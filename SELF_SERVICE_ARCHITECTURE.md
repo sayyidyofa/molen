@@ -25,7 +25,7 @@
 │                                                                      │
 │  ┌─────────────────────────────────────────────────────────────┐   │
 │  │                                                              │   │
-│  │  1. Consume from Redpanda                                   │   │
+│  │  1. Consume from Kafka                                   │   │
 │  │  2. Enrich & Fetch Features → Redis (Hot State)            │   │
 │  │  3. Shadow/Live Inference → Molen API                       │   │
 │  │  4. Sink Alerts → Elasticsearch                             │   │
@@ -60,9 +60,9 @@
 │  │  • TriageService - Alert investigation                      │   │
 │  │                                                              │   │
 │  │  External Clients (Interface Factory Pattern):              │   │
-│  │  • RedpandaConnectClient - Pipeline management              │   │
+│  │  • KafkaConnectClient - Pipeline management              │   │
 │  │  • MLTrainer - Model training                               │   │
-│  │  • S3Client - Model storage (Garage/R2)                     │   │
+│  │  • S3Client - Model storage (S3/R2)                     │   │
 │  │  • ElasticsearchClient - Alerts & logs                      │   │
 │  │  • RedisClient - Velocity state                             │   │
 │  └──────────────────────────────────────────────────────────────┘   │
@@ -72,14 +72,14 @@
 │                 SELF-SERVICE ML LIFECYCLE                           │
 │                                                                      │
 │  ┌─────────────────┐                                                │
-│  │ 1. Extract      │ → Select 7-day data window from Garage        │
+│  │ 1. Extract      │ → Select 7-day data window from S3        │
 │  └────────┬────────┘                                                │
 │           │                                                          │
 │  ┌────────▼────────┐                                                │
 │  │ 2. Train        │ → Bun/Python Trainer                          │
-│  │                 │   • Load Parquet from Garage                   │
+│  │                 │   • Load Parquet from S3                   │
 │  │                 │   • Train XGBoost/LightGBM                     │
-│  │                 │   • Save model.bin to Garage                   │
+│  │                 │   • Save model.bin to S3                   │
 │  └────────┬────────┘                                                │
 │           │                                                          │
 │  ┌────────▼────────┐                                                │
@@ -203,12 +203,11 @@ output:
 ## Technology Stack Changes
 
 ### Before (V1)
-- **Message Broker:** LavinMQ
 - **Model Deployment:** Manual, static
 - **Configuration:** Code changes required
 
 ### After (V2)
-- **Message Broker:** Redpanda (Kafka-compatible, higher performance)
+- **Message Broker:** Kafka (Kafka-compatible, higher performance)
 - **Stream Processing:** Kafka Connect (declarative YAML pipelines)
 - **Model Training:** Self-service via UI
 - **Model Deployment:** Shadow mode → Promote workflow
@@ -224,7 +223,7 @@ Step 1: EXTRACT
 │ UI: Select date range               │
 │ Input: Start Date, End Date         │
 │ Action: Extract training data       │
-│ Output: Parquet files in Garage     │
+│ Output: Parquet files in S3     │
 └─────────────────────────────────────┘
            ↓
 Step 2: TRAIN
@@ -232,7 +231,7 @@ Step 2: TRAIN
 │ UI: Configure hyperparameters       │
 │ Input: Model type, features         │
 │ Action: Submit training job         │
-│ Output: model.bin in Garage         │
+│ Output: model.bin in S3         │
 │         Metrics: Accuracy, F1, etc. │
 └─────────────────────────────────────┘
            ↓
@@ -258,7 +257,7 @@ Step 5: PROMOTE
 │ UI: Promotion approval button       │
 │ Action: Archive old Live            │
 │         Promote Candidate → Live    │
-│         Reload Redpanda pipeline    │
+│         Reload Kafka pipeline    │
 │ Result: New model in production     │
 └─────────────────────────────────────┘
 ```
@@ -338,14 +337,14 @@ Both support:
 
 ### Optimization Strategies
 
-1. **Redpanda vs Kafka:** ~2x faster broker performance
+1. **Kafka vs Kafka:** ~2x faster broker performance
 2. **Kafka Connect:** Native binary, minimal overhead
 3. **Bun Runtime:** ~3x faster than Node.js for API
 4. **Redis Hot State:** In-memory velocity checks (<1ms)
 5. **Model Inference:** Pre-loaded models, no disk I/O
 
 **Measured Latency Budget:**
-- Redpanda ingress: 2-3ms
+- Kafka ingress: 2-3ms
 - Kafka Connect processing: 5-8ms
 - Molen API inference: 8-12ms
 - Elasticsearch logging: 3-5ms (async)
@@ -383,15 +382,15 @@ CREATE TABLE model_audit (
 ### Environment Variables
 
 ```env
-# Redpanda
+# Kafka
 KAFKA_BROKER_URL=localhost:9092
 KAFKA_CONNECT_URL=http://localhost:4195
 
 # S3-compatible storage (Training Data & Models)
-GARAGE_ENDPOINT=https://garage.internal:3900
-GARAGE_ACCESS_KEY_ID=xxx
-GARAGE_SECRET_ACCESS_KEY=xxx
-GARAGE_TRAINING_BUCKET=training-data
+S3_ENDPOINT=https://s3.internal:3900
+S3_ACCESS_KEY_ID=xxx
+S3_SECRET_ACCESS_KEY=xxx
+S3_TRAINING_BUCKET=training-data
 
 # Existing services
 ELASTIC_URL=https://elastic.bongko.id/
@@ -402,14 +401,14 @@ REDIS_URL=redis://localhost:6379
 
 ```yaml
 services:
-  redpanda:
-    image: redpandadata/redpanda:latest
+  kafka:
+    image: kafkadata/kafka:latest
     ports:
       - "9092:9092"
       - "8081:8081"
       
-  redpanda-connect:
-    image: redpandadata/connect:latest
+  kafka-connect:
+    image: kafkadata/connect:latest
     ports:
       - "4195:4195"
     volumes:
@@ -418,8 +417,8 @@ services:
   molen-api:
     build: ./packages/api
     environment:
-      - KAFKA_BROKER_URL=redpanda:9092
-      - KAFKA_CONNECT_URL=http://redpanda-connect:4195
+      - KAFKA_BROKER_URL=kafka:9092
+      - KAFKA_CONNECT_URL=http://kafka-connect:4195
       
   molen-ui:
     build: ./packages/ui
@@ -433,7 +432,7 @@ services:
 
 ### Phase 1: Parallel Run (Week 1-2)
 - Deploy V2 alongside V1
-- Route 10% of traffic to Redpanda
+- Route 10% of traffic to Kafka
 - Monitor latency and accuracy
 
 ### Phase 2: Shadow Mode (Week 3-4)
@@ -467,7 +466,7 @@ services:
 - [ ] Explainability (SHAP values in UI)
 
 ### Long-term (Next 6 months)
-- [ ] Real-time feature engineering in Redpanda
+- [ ] Real-time feature engineering in Kafka
 - [ ] Streaming model updates (online learning)
 - [ ] Multi-tenancy (per-country models)
 - [ ] Kubernetes operator for model deployment
@@ -486,7 +485,7 @@ services:
 
 ## References
 
-- [Redpanda Documentation](https://docs.redpanda.com/)
+- [Kafka Documentation](https://docs.kafka.com/)
 - [Kafka Connect Guide](https://www.benthos.dev/)
 - [Interface Factory Pattern](./IMPLEMENTATION.md)
 - [S3 Storage Guide](./S3_STORAGE_GUIDE.md)

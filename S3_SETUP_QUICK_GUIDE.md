@@ -116,7 +116,6 @@ console.log('Available models:', models);
 await s3Client.close();
 ```
 
-## Integration with Flink
 
 Example workflow for training and storing models:
 
@@ -124,10 +123,7 @@ Example workflow for training and storing models:
 import { ExternalClientFactory } from '@molen/core';
 
 const s3 = ExternalClientFactory.createS3Client();
-const flink = ExternalClientFactory.createFlinkClient();
 
-// 1. Submit training job to Flink
-const jobId = await flink.submitJob({
   type: 'model-training',
   algorithm: 'random-forest',
   dataSource: 'fraud-transactions',
@@ -138,7 +134,6 @@ console.log('Training model...');
 let status;
 do {
   await new Promise(resolve => setTimeout(resolve, 5000));
-  status = await flink.getJobStatus(jobId);
 } while (status.state === 'RUNNING');
 
 // 3. Upload trained model to S3

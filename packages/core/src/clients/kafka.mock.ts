@@ -6,7 +6,7 @@ import {
 } from './kafka.interface';
 
 /**
- * Mock implementation of Redpanda Connect client for testing
+ * Mock implementation of Kafka Connect client for testing
  */
 export class MockKafkaConnectClient implements IKafkaConnectClient {
   private pipelines: Map<string, PipelineConfig> = new Map();

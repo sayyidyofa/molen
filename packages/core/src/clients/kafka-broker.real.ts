@@ -19,7 +19,7 @@ export class RealKafkaBrokerClient implements IKafkaBrokerClient {
   private consumers: Map<string, Consumer> = new Map();
 
   constructor(config: KafkaBrokerConfig) {
-    // Create Kafka instance with Redpanda configuration
+    // Create Kafka instance with Kafka configuration
     this.kafka = new Kafka({
       brokers: config.brokers,
       ssl: config.ssl ? {} : false,
@@ -30,7 +30,7 @@ export class RealKafkaBrokerClient implements IKafkaBrokerClient {
             password: config.sasl.password,
           }
         : undefined,
-      clientId: 'molen-redpanda-client',
+      clientId: 'molen-kafka-client',
     });
 
     this.admin = this.kafka.admin();

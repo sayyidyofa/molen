@@ -24,7 +24,6 @@ export interface PipelineStatus {
 
 /**
  * IKafkaConnectClient - Interface for Kafka Connect operations
- * Replaces direct Flink integration for flexible waterfall processing
  */
 export interface IKafkaConnectClient {
   /**

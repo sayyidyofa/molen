@@ -124,21 +124,16 @@ if (exists) {
 await s3Client.deleteModel('models/old-model-v0.pkl');
 ```
 
-### Integration with Flink
 
-The S3 storage is designed to work seamlessly with Flink for ML workflows:
 
 ```typescript
 import { ExternalClientFactory } from '@molen/core';
 
 // Initialize clients
 const s3Client = ExternalClientFactory.createS3Client();
-const flinkClient = ExternalClientFactory.createFlinkClient();
 
 // Example: Training workflow
 async function trainModel() {
-  // 1. Submit training job to Flink
-  const jobId = await flinkClient.submitJob({
     type: 'model-training',
     dataSource: 'fraud-transactions',
     algorithm: 'random-forest',
@@ -148,7 +143,6 @@ async function trainModel() {
   let status;
   do {
     await new Promise(resolve => setTimeout(resolve, 5000));
-    status = await flinkClient.getJobStatus(jobId);
   } while (status.state === 'RUNNING');
 
   // 3. Download trained model and store in S3
@@ -173,8 +167,6 @@ async function loadModelForInference() {
   const latestModel = models[models.length - 1];
   const modelData = await s3Client.downloadModel(latestModel);
   
-  // 3. Use model for inference in Flink
-  await flinkClient.submitJob({
     type: 'model-inference',
     model: modelData.toString('base64'),
     dataSource: 'live-transactions',
@@ -239,7 +231,6 @@ await s3Client.uploadModel(
     accuracy: '0.95',
     f1Score: '0.93',
     trainedAt: new Date().toISOString(),
-    trainedBy: 'flink-job-12345',
   }
 );
 ```

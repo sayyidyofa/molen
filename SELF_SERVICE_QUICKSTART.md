@@ -8,7 +8,7 @@ Molen is a Self-Service Internal Developer Platform (IDP) that empowers Fraud St
 
 - [Bun](https://bun.sh/) >= 1.0.0
 - Docker and Docker Compose (for local development)
-- Access to Redpanda, S3-compatible storage, Elasticsearch, and Redis
+- Access to Kafka, S3-compatible storage, Elasticsearch, and Redis
 
 ## Quick Setup
 
@@ -30,15 +30,15 @@ PORT=3000
 SHADOW_MODE=false
 USE_MOCKS=true
 
-# Redpanda (Message Broker)
+# Kafka (Message Broker)
 KAFKA_BROKER_URL=localhost:9092
 KAFKA_CONNECT_URL=http://localhost:4195
 
 # Storage
-GARAGE_ENDPOINT=https://garage.internal:3900
-GARAGE_ACCESS_KEY_ID=your_access_key
-GARAGE_SECRET_ACCESS_KEY=your_secret_key
-GARAGE_TRAINING_BUCKET=training-data
+S3_ENDPOINT=https://s3.internal:3900
+S3_ACCESS_KEY_ID=your_access_key
+S3_SECRET_ACCESS_KEY=your_secret_key
+S3_TRAINING_BUCKET=training-data
 
 S3_ENDPOINT=https://r2.cloudflarestorage.com
 S3_ACCESS_KEY_ID=your_r2_key
@@ -56,7 +56,7 @@ REDIS_URL=redis://default:password@redis.example.com:12394
 ### 3. Start Infrastructure (Docker)
 
 ```bash
-docker-compose up -d redpanda redpanda-connect
+docker-compose up -d kafka kafka-connect
 ```
 
 ### 4. Start Molen Services
@@ -84,7 +84,7 @@ Access:
 1. Navigate to **Model Training** in the UI
 2. Select date range (e.g., last 7 days)
 3. Click **Extract Data**
-4. Wait for Parquet files to be saved to Garage
+4. Wait for Parquet files to be saved to S3
 
 **API Alternative:**
 ```bash
@@ -294,7 +294,7 @@ USE_MOCKS=true
 - ✅ Kafka Connect (in-memory pipelines)
 - ✅ Elasticsearch (in-memory store)
 - ✅ Redis (in-memory cache)
-- ✅ S3/Garage (in-memory blobs)
+- ✅ S3/S3 (in-memory blobs)
 
 **Run Tests:**
 ```bash
@@ -363,7 +363,7 @@ curl -X DELETE http://localhost:3000/ml/training/{jobId}
 
 ## Architecture Components
 
-### Redpanda (Message Broker)
+### Kafka (Message Broker)
 - **Purpose:** Ingest transaction events
 - **Topic:** `transactions`
 - **Performance:** 10M+ msgs/sec
@@ -406,7 +406,7 @@ curl -X DELETE http://localhost:3000/ml/training/{jobId}
 lsof -i :3000
 
 # Check environment variables
-env | grep REDPANDA
+env | grep KAFKA
 
 # Check logs
 tail -f packages/api/logs/error.log
@@ -419,7 +419,7 @@ tail -f packages/api/logs/error.log
 curl http://localhost:3000/ml/training/{jobId}
 
 # Common issues:
-# 1. Invalid date range (no data in Garage)
+# 1. Invalid date range (no data in S3)
 # 2. Insufficient data (< 1000 samples)
 # 3. Missing features in dataset
 ```
@@ -450,7 +450,7 @@ curl http://localhost:4195/ready
 curl -X POST http://localhost:3000/rules/publish
 
 # Check pipeline logs
-docker logs redpanda-connect
+docker logs kafka-connect
 ```
 
 ---

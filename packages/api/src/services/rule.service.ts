@@ -33,7 +33,6 @@ export class RuleService {
    * Update a rule threshold
    */
   async updateRule(ruleId: string, updates: RuleUpdate): Promise<Rule> {
-    // In production, this would update Postgres and trigger LavinMQ broadcast
     await this.elasticClient.index({
       index: 'fraud-rules',
       id: ruleId,
@@ -47,10 +46,7 @@ export class RuleService {
   }
 
   /**
-   * Publish rule changes (triggers LavinMQ broadcast)
    */
   async publishRules(): Promise<void> {
-    // Placeholder for LavinMQ integration
-    console.log('Publishing rule changes to LavinMQ...');
   }
 }

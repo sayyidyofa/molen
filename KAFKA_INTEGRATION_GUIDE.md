@@ -6,7 +6,6 @@ This guide covers the Kafka broker integration using the Kafka API (KafkaJS) for
 
 ## Architecture
 
-Kafka replaces LavinMQ as the message broker in Molen's V2.0 architecture:
 
 ```
 Transaction Events → Kafka Broker → Kafka Connect → Fraud Detection Pipeline
@@ -71,7 +70,7 @@ USE_MOCKS=false
 ### Kafka Cloud Example
 
 ```bash
-KAFKA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
+KAFKA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092
 KAFKA_USERNAME=bongko
 KAFKA_PASSWORD=P@ssw0rd
 KAFKA_SASL_MECHANISM=scram-sha-256
@@ -517,7 +516,7 @@ Error: Topic already exists
 
 ## References
 
-- [Kafka Documentation](https://docs.redpanda.com/)
+- [Kafka Documentation](https://docs.kafka.com/)
 - [KafkaJS Documentation](https://kafka.js.org/)
 - [Molen Architecture Guide](./SELF_SERVICE_ARCHITECTURE.md)
 - [Integration Tests Guide](../packages/core/tests/integration/README.md)

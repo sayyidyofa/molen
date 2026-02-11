@@ -8,7 +8,7 @@ Create a `.env` file in the repository root (this file is gitignored):
 
 ```bash
 # Kafka Broker Configuration
-KAFKA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
+KAFKA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092
 KAFKA_USERNAME=bongko
 KAFKA_PASSWORD=P@ssw0rd
 KAFKA_SASL_MECHANISM=scram-sha-256
@@ -20,7 +20,7 @@ USE_MOCKS=false
 Or export environment variables:
 
 ```bash
-export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
+export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092"
 export KAFKA_USERNAME="bongko"
 export KAFKA_PASSWORD="P@ssw0rd"
 export KAFKA_SASL_MECHANISM="scram-sha-256"
@@ -57,7 +57,7 @@ Expected output:
 
 ### 4. Quick Test Script
 
-Create a file `test-redpanda.ts`:
+Create a file `test-kafka.ts`:
 
 ```typescript
 import { ExternalClientFactory } from './packages/core/src/index';
@@ -135,7 +135,7 @@ testKafka();
 
 Run with:
 ```bash
-bun run test-redpanda.ts
+bun run test-kafka.ts
 ```
 
 ### 5. GitHub Secrets Setup
@@ -144,7 +144,7 @@ For CI/CD, add these secrets to your GitHub repository (Settings → Secrets and
 
 | Secret Name | Value |
 |-------------|-------|
-| `KAFKA_BROKERS` | `d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092` |
+| `KAFKA_BROKERS` | `d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092` |
 | `KAFKA_USERNAME` | `bongko` |
 | `KAFKA_PASSWORD` | `P@ssw0rd` |
 | `KAFKA_SASL_MECHANISM` | `scram-sha-256` |
@@ -156,8 +156,8 @@ The KafkaJS example provided translates to:
 ```javascript
 const {Kafka} = require("kafkajs");
 
-const redpanda = new Kafka({
-  brokers: ["d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"],
+const kafka = new Kafka({
+  brokers: ["d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092"],
   ssl: {},
   sasl: {
     mechanism: "scram-sha-256",
@@ -166,7 +166,7 @@ const redpanda = new Kafka({
   }
 });
 
-const admin = redpanda.admin();
+const admin = kafka.admin();
 
 admin.connect().then(() => {
   admin.createTopics({

@@ -86,67 +86,85 @@ jobs:
         version: 'latest'
     
     - name: Configure kubectl for OpenShift
+      env:
+        KUBE_API_URL: ${{ secrets.KUBERNETES_API_ENDPOINT }}
+        KUBE_TOKEN: ${{ secrets.KUBERNETES_API_TOKEN }}
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
         mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config || \
         kubectl config set-cluster openshift \
-          --server=${{ secrets.KUBE_API_URL }} \
+          --server=$KUBE_API_URL \
           --insecure-skip-tls-verify=true
         kubectl config set-credentials deployer \
-          --token=${{ secrets.KUBE_SERVICE_TOKEN }}
+          --token=$KUBE_TOKEN
         kubectl config set-context openshift \
           --cluster=openshift \
           --user=deployer \
-          --namespace=${{ secrets.KUBE_NAMESPACE }}
+          --namespace=$KUBE_NAMESPACE
         kubectl config use-context openshift
     
     - name: Create namespace if not exists
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
-        kubectl create namespace ${{ secrets.KUBE_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+        kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
     
     - name: Create or update secrets
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
         kubectl create secret generic molen-secrets \
-          --namespace=${{ secrets.KUBE_NAMESPACE }} \
-          --from-literal=# FLINK_CLIENT_ID='${{ secrets.# FLINK_CLIENT_ID }}' \
-          --from-literal=# FLINK_CLIENT_SECRET='${{ secrets.# FLINK_CLIENT_SECRET }}' \
+          --namespace=$KUBE_NAMESPACE \
+          --from-literal=ELASTIC_URL='${{ secrets.ELASTIC_URL }}' \
           --from-literal=ELASTIC_USERNAME='${{ secrets.ELASTIC_USERNAME }}' \
           --from-literal=ELASTIC_PASSWORD='${{ secrets.ELASTIC_PASSWORD }}' \
           --from-literal=REDIS_URL='${{ secrets.REDIS_URL }}' \
           --from-literal=S3_ENDPOINT='${{ secrets.S3_ENDPOINT }}' \
           --from-literal=S3_ACCESS_KEY_ID='${{ secrets.S3_ACCESS_KEY_ID }}' \
           --from-literal=S3_SECRET_ACCESS_KEY='${{ secrets.S3_SECRET_ACCESS_KEY }}' \
+          --from-literal=S3_BUCKET='${{ secrets.S3_BUCKET }}' \
           --from-literal=KAFKA_BROKERS='${{ secrets.KAFKA_BROKERS }}' \
           --from-literal=KAFKA_USERNAME='${{ secrets.KAFKA_USERNAME }}' \
           --from-literal=KAFKA_PASSWORD='${{ secrets.KAFKA_PASSWORD }}' \
+          --from-literal=KAFKA_SASL_MECHANISM='${{ secrets.KAFKA_SASL_MECHANISM }}' \
           --dry-run=client -o yaml | kubectl apply -f -
     
     - name: Deploy ConfigMap
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
-        kubectl apply -f k8s/configmap.yaml --namespace=${{ secrets.KUBE_NAMESPACE }}
+        kubectl apply -f k8s/configmap.yaml --namespace=$KUBE_NAMESPACE
     
     - name: Deploy API
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
-        kubectl apply -f k8s/api-deployment.yaml --namespace=${{ secrets.KUBE_NAMESPACE }}
-        kubectl apply -f k8s/api-service.yaml --namespace=${{ secrets.KUBE_NAMESPACE }}
+        kubectl apply -f k8s/api-deployment.yaml --namespace=$KUBE_NAMESPACE
+        kubectl apply -f k8s/api-service.yaml --namespace=$KUBE_NAMESPACE
     
     - name: Deploy UI
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
-        kubectl apply -f k8s/ui-deployment.yaml --namespace=${{ secrets.KUBE_NAMESPACE }}
-        kubectl apply -f k8s/ui-service.yaml --namespace=${{ secrets.KUBE_NAMESPACE }}
+        kubectl apply -f k8s/ui-deployment.yaml --namespace=$KUBE_NAMESPACE
+        kubectl apply -f k8s/ui-service.yaml --namespace=$KUBE_NAMESPACE
     
     - name: Wait for deployments
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
-        kubectl rollout status deployment/molen-api --namespace=${{ secrets.KUBE_NAMESPACE }} --timeout=5m
-        kubectl rollout status deployment/molen-ui --namespace=${{ secrets.KUBE_NAMESPACE }} --timeout=5m
+        kubectl rollout status deployment/molen-api --namespace=$KUBE_NAMESPACE --timeout=5m
+        kubectl rollout status deployment/molen-ui --namespace=$KUBE_NAMESPACE --timeout=5m
     
     - name: Get deployment status
+      env:
+        KUBE_NAMESPACE: ${{ secrets.KUBERNETES_NAMESPACE }}
       run: |
         echo "=== Deployments ==="
-        kubectl get deployments --namespace=${{ secrets.KUBE_NAMESPACE }}
+        kubectl get deployments --namespace=$KUBE_NAMESPACE
         echo ""
         echo "=== Pods ==="
-        kubectl get pods --namespace=${{ secrets.KUBE_NAMESPACE }}
+        kubectl get pods --namespace=$KUBE_NAMESPACE
         echo ""
         echo "=== Services ==="
-        kubectl get services --namespace=${{ secrets.KUBE_NAMESPACE }}
+        kubectl get services --namespace=$KUBE_NAMESPACE

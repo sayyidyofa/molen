@@ -103,7 +103,7 @@ export class ExternalClientFactory {
   /**
    * Create a Kafka broker client for Kafka API access
    * Uses mock implementation when USE_MOCKS=true
-   * Provides direct access to Kafka message streaming (compatible with Kafka, Redpanda, etc.)
+   * Provides direct access to Kafka message streaming (compatible with Kafka, Kafka, etc.)
    */
   static createKafkaBrokerClient(): IKafkaBrokerClient {
     if (process.env.USE_MOCKS === 'true') {

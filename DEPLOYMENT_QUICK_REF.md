@@ -29,8 +29,8 @@ export S3_ENDPOINT="https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorag
 export S3_ACCESS_KEY_ID="e6cf9886c1fb510ce1f5afd212cd7c07"
 export S3_SECRET_ACCESS_KEY="6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838"
 
-# Redpanda
-export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
+# Kafka
+export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092"
 export KAFKA_USERNAME="bongko"
 export KAFKA_PASSWORD="P@ssw0rd"
 ```
@@ -146,7 +146,7 @@ Go to: Settings → Secrets and variables → Actions
 | S3_ENDPOINT | https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com |
 | S3_ACCESS_KEY_ID | e6cf9886c1fb510ce1f5afd212cd7c07 |
 | S3_SECRET_ACCESS_KEY | 6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838 |
-| KAFKA_BROKERS | d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092 |
+| KAFKA_BROKERS | d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092 |
 | KAFKA_USERNAME | bongko |
 | KAFKA_PASSWORD | P@ssw0rd |
 
@@ -255,7 +255,7 @@ bun run demo.ts
 ```
 
 Shows V2.0 features:
-- Redpanda integration
+- Kafka integration
 - ML training workflow
 - Shadow mode testing
 - Model comparison

@@ -2,7 +2,7 @@
 
 **Internal Developer Platform (IDP) for Fraud Strategy Analysts**
 
-Molen empowers fraud analysts to train, test, and deploy ML fraud detection models without writing code. Built on Redpanda + Kafka Connect for flexible, high-performance stream processing.
+Molen empowers fraud analysts to train, test, and deploy ML fraud detection models without writing code. Built on Kafka + Kafka Connect for flexible, high-performance stream processing.
 
 ## 🎯 Key Features
 
@@ -31,7 +31,7 @@ This project uses a **monorepo architecture** with a self-service ML platform:
 
 ### Technology Stack
 
-- **Message Broker:** Redpanda (Kafka-compatible, high-performance)
+- **Message Broker:** Kafka (Kafka-compatible, high-performance)
 - **Stream Processing:** Kafka Connect (declarative YAML pipelines)
 - **API:** Bun + ElysiaJS (3x faster than Node.js)
 - **UI:** React + Vite
@@ -68,12 +68,12 @@ Create `.env` file:
 PORT=3000
 SHADOW_MODE=false
 
-# Redpanda
+# Kafka
 KAFKA_BROKER_URL=localhost:9092
 KAFKA_CONNECT_URL=http://localhost:4195
 
 # Storage
-GARAGE_ENDPOINT=https://garage.internal:3900
+S3_ENDPOINT=https://s3.internal:3900
 S3_ENDPOINT=https://r2.cloudflarestorage.com
 
 # Analytics
@@ -104,7 +104,7 @@ Access:
 ## The "Molen Path" - Analyst Workflow
 
 ```
-1. EXTRACT   → Select 7-day data window from Garage
+1. EXTRACT   → Select 7-day data window from S3
 2. TRAIN     → Configure & submit XGBoost/LightGBM training
 3. EVALUATE  → Deploy candidate in Shadow Mode (48-72 hours)
 4. COMPARE   → View Live vs Candidate metrics dashboard
@@ -265,7 +265,6 @@ molen/
 ### Rule Management
 - `GET /rules` - Get all fraud detection rules
 - `PUT /rules/:ruleId` - Update a specific rule
-- `POST /rules/publish` - Publish rule changes to LavinMQ
 
 ### Case Triage
 - `GET /triage/cases` - Get flagged transactions (query params: from, size, minScore)

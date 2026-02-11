@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { MockKafkaConnectClient } from '../src/clients/kafka.mock';
-import type { PipelineConfig } from '../src/clients/redpanda.interface';
+import type { PipelineConfig } from '../src/clients/kafka.interface';
 
 describe('MockKafkaConnectClient', () => {
   let client: MockKafkaConnectClient;

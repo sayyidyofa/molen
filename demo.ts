@@ -2,7 +2,7 @@
 
 /**
  * Molen V2.0 Self-Service Fraud-Ops Platform Demo
- * Demonstrates the complete self-service ML lifecycle with Redpanda integration
+ * Demonstrates the complete self-service ML lifecycle with Kafka integration
  */
 
 // Set environment to use mocks for demo
@@ -24,19 +24,19 @@ async function main() {
   const elasticClient = ExternalClientFactory.createElasticClient();
   const redisClient = ExternalClientFactory.createRedisClient();
   const s3Client = ExternalClientFactory.createS3Client();
-  const redpandaBroker = ExternalClientFactory.createKafkaBrokerClient();
+  const kafkaBroker = ExternalClientFactory.createKafkaBrokerClient();
   const mlTrainer = ExternalClientFactory.createMLTrainer();
   console.log('   ✓ Elasticsearch client (Alerts & Analytics)');
   console.log('   ✓ Redis client (Velocity State)');
   console.log('   ✓ S3 client (Model Storage - Cloudflare R2)');
-  console.log('   ✓ Redpanda Broker (Event Streaming)');
+  console.log('   ✓ Kafka Broker (Event Streaming)');
   console.log('   ✓ ML Trainer (Self-Service Training)\n');
 
-  // 2. Redpanda: Connect and create topics
-  console.log('2️⃣  REDPANDA: Setting up event streaming');
+  // 2. Kafka: Connect and create topics
+  console.log('2️⃣  KAFKA: Setting up event streaming');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  await redpandaBroker.connect();
-  await redpandaBroker.createTopic({
+  await kafkaBroker.connect();
+  await kafkaBroker.createTopic({
     topic: 'fraud-events',
     numPartitions: 3,
     replicationFactor: -1,
@@ -105,8 +105,8 @@ async function main() {
     liveCorrect += (liveFlagged === actualFraud) ? 1 : 0;
     candidateCorrect += (candidateFlagged === actualFraud) ? 1 : 0;
 
-    // Publish to Redpanda for real-time processing
-    await redpandaBroker.produce({
+    // Publish to Kafka for real-time processing
+    await kafkaBroker.produce({
       topic: 'fraud-events',
       key: transaction.userId,
       value: JSON.stringify({
@@ -168,7 +168,7 @@ async function main() {
   console.log(`   ✓ Velocity rules: max 5/min, 20/hour\n`);
 
   // Cleanup
-  await redpandaBroker.disconnect();
+  await kafkaBroker.disconnect();
 
   console.log('═══════════════════════════════════════════════════');
   console.log('✅ DEMO COMPLETED SUCCESSFULLY!\n');

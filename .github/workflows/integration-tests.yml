@@ -41,10 +41,6 @@ jobs:
           ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
           ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
           
-          # Flink credentials with Cloudflare Access
-          # FLINK_URL: ${{ secrets.# FLINK_URL }}
-          # FLINK_CLIENT_ID: ${{ secrets.# FLINK_CLIENT_ID }}
-          # FLINK_CLIENT_SECRET: ${{ secrets.# FLINK_CLIENT_SECRET }}
           
           # Redis connection string
           REDIS_URL: ${{ secrets.REDIS_URL }}
@@ -55,7 +51,7 @@ jobs:
           S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           
-          # Redpanda broker (Kafka API)
+          # Kafka broker (Kafka API)
           KAFKA_BROKERS: ${{ secrets.KAFKA_BROKERS }}
           KAFKA_USERNAME: ${{ secrets.KAFKA_USERNAME }}
           KAFKA_PASSWORD: ${{ secrets.KAFKA_PASSWORD }}

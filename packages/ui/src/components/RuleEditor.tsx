@@ -48,7 +48,6 @@ export function RuleEditor() {
     setPublishing(true);
     try {
       await apiClient.publishRules();
-      alert('Rules published successfully! Changes broadcasted to LavinMQ.');
     } catch (error) {
       console.error('Failed to publish rules:', error);
       alert('Failed to publish rules');
@@ -106,7 +105,6 @@ export function RuleEditor() {
           cursor: publishing ? 'not-allowed' : 'pointer'
         }}
       >
-        {publishing ? 'Publishing...' : 'Publish Changes to LavinMQ'}
       </button>
     </div>
   );

@@ -7,7 +7,6 @@ export interface ApiConfig {
   elasticUrl: string;
   redisHost: string;
   redisPort: number;
-  flinkApiUrl: string;
   caCertPath?: string;
   useMocks: boolean;
   databaseUrl: string;
@@ -36,7 +35,6 @@ export function loadConfig(): ApiConfig {
     elasticUrl: process.env.ELASTIC_URL || process.env.INDEX_URL || 'http://localhost:9200',
     redisHost: process.env.REDIS_HOST || 'localhost',
     redisPort: parseInt(process.env.REDIS_PORT || '6379', 10),
-    flinkApiUrl: process.env.FLINK_API_URL || 'http://localhost:8081',
     caCertPath: process.env.CA_CERT_PATH,
     useMocks: process.env.USE_MOCKS === 'true',
     databaseUrl: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/molen',

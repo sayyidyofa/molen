@@ -1,6 +1,5 @@
 # Integration Tests
 
-This directory contains integration tests for external service clients (Elasticsearch, Flink, Redis, and S3).
 
 ## Overview
 
@@ -23,9 +22,6 @@ export ELASTIC_URL="https://elastic.bongko.id/"
 export ELASTIC_USERNAME="sayyidyofa"
 export ELASTIC_PASSWORD="your-password"
 
-export FLINK_URL="https://flink.bongko.id"
-export FLINK_CLIENT_ID="your-client-id"
-export FLINK_CLIENT_SECRET="your-client-secret"
 
 export REDIS_URL="redis://default:password@host:port"
 
@@ -52,7 +48,6 @@ Integration tests run automatically via GitHub Actions workflow when:
 
 Credentials are stored as GitHub repository secrets:
 - `ELASTIC_URL`, `ELASTIC_USERNAME`, `ELASTIC_PASSWORD`
-- `FLINK_URL`, `FLINK_CLIENT_ID`, `FLINK_CLIENT_SECRET`
 - `REDIS_URL`
 - `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`
 - `KAFKA_BROKERS`, `KAFKA_USERNAME`, `KAFKA_PASSWORD`, `KAFKA_SASL_MECHANISM`
@@ -73,7 +68,6 @@ Credentials are stored as GitHub repository secrets:
 - Document indexing and searching
 - Cluster information retrieval
 
-### Flink (flink.integration.test.ts)
 - Connection with Cloudflare Access headers
 - Job listing via REST API
 - Job status retrieval (if jobs exist)
@@ -112,8 +106,6 @@ Credentials are stored as GitHub repository secrets:
 - URL: `https://elastic.bongko.id/`
 - Auth: Basic authentication with username/password
 
-### Flink
-- URL: `https://flink.bongko.id`
 - Auth: Cloudflare Access headers
   - `CF-Access-Client-Id`
   - `CF-Access-Client-Secret`

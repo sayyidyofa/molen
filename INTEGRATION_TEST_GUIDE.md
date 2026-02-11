@@ -15,8 +15,6 @@ bun test tests/integration
 # Elasticsearch only
 bun test tests/integration/elastic.integration.test.ts
 
-# Flink only
-bun test tests/integration/flink.integration.test.ts
 
 # Redis only
 bun test tests/integration/redis.integration.test.ts
@@ -47,9 +45,6 @@ export ELASTIC_URL="https://elastic.bongko.id/"
 export ELASTIC_USERNAME="sayyidyofa"
 export ELASTIC_PASSWORD="Pi@rgen8"
 
-export FLINK_URL="https://flink.bongko.id"
-export FLINK_CLIENT_ID="9e677b2b60b017835bca23b3267cd224.access"
-export FLINK_CLIENT_SECRET="9f156234b1a72bc0ba68ee25683ff1844b4a5dd1ab29a89f4d647deeefaa5559"
 
 export REDIS_URL="redis://default:PZMF7X2Qxxtt3Xet21PbLO3dEP13S1Yx@redis-12394.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:12394"
 
@@ -68,9 +63,6 @@ ELASTIC_URL=https://elastic.bongko.id/
 ELASTIC_USERNAME=sayyidyofa
 ELASTIC_PASSWORD=Pi@rgen8
 
-FLINK_URL=https://flink.bongko.id
-FLINK_CLIENT_ID=9e677b2b60b017835bca23b3267cd224.access
-FLINK_CLIENT_SECRET=9f156234b1a72bc0ba68ee25683ff1844b4a5dd1ab29a89f4d647deeefaa5559
 
 REDIS_URL=redis://default:PZMF7X2Qxxtt3Xet21PbLO3dEP13S1Yx@redis-12394.c252.ap-southeast-1-1.ec2.cloud.redislabs.com:12394
 ```
@@ -93,8 +85,6 @@ $ bun test tests/integration
 ✓ RealElasticClient Integration > should connect to Elasticsearch and get cluster info
 ✓ RealElasticClient Integration > should create and search for a test document
 
-✓ RealFlinkClient Integration > should connect to Flink and list jobs
-✓ RealFlinkClient Integration > should get job status (if jobs exist)
 
 ✓ RealRedisClient Integration > should connect to Redis and perform basic operations
 ✓ RealRedisClient Integration > should handle expiry correctly
@@ -111,8 +101,6 @@ $ bun test tests/integration
 
 ⚠️  Elasticsearch integration tests skipped. Set ELASTIC_URL, ELASTIC_USERNAME, and ELASTIC_PASSWORD to run.
 
-✓ RealFlinkClient Integration > should connect to Flink and list jobs
-✓ RealFlinkClient Integration > should get job status (if jobs exist)
 
 ✓ RealRedisClient Integration > should connect to Redis and perform basic operations
 ✓ RealRedisClient Integration > should handle expiry correctly
@@ -137,7 +125,6 @@ $ bun test tests/integration
    - Searches for and verifies the document
    - Tests full write-read cycle
 
-### Flink Tests
 
 1. **List Jobs Test**
    - Tests Cloudflare Access header authentication
@@ -194,7 +181,6 @@ Ensure all environment variables are set:
 ```bash
 # Check if variables are set
 echo $ELASTIC_URL
-echo $FLINK_URL
 echo $REDIS_URL
 
 # If empty, set them or source .env file
@@ -213,8 +199,6 @@ Test connectivity manually:
 # Test Elasticsearch
 curl -u "sayyidyofa:Pi@rgen8" "https://elastic.bongko.id/"
 
-# Test Flink
-curl -X GET "https://flink.bongko.id/jobs" \
   -H "CF-Access-Client-Id: 9e677b2b60b017835bca23b3267cd224.access" \
   -H "CF-Access-Client-Secret: 9f156234b1a72bc0ba68ee25683ff1844b4a5dd1ab29a89f4d647deeefaa5559"
 

@@ -36,7 +36,7 @@ You'll need credentials for:
 - Elasticsearch
 - Redis
 - S3/Cloudflare R2
-- Redpanda
+- Kafka
 
 ## Quick Start
 
@@ -55,7 +55,7 @@ export REDIS_URL="redis://default:PZMF7X2Qxxtt3Xet21PbLO3dEP13S1Yx@redis-12394.c
 export S3_ENDPOINT="https://08ebc404f616b60b048d5dbbe34af11a.r2.cloudflarestorage.com"
 export S3_ACCESS_KEY_ID="e6cf9886c1fb510ce1f5afd212cd7c07"
 export S3_SECRET_ACCESS_KEY="6676138c59c177b6fee430140e01e2fa01a2262c53780d38777aa206fa78b838"
-export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092"
+export KAFKA_BROKERS="d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.kafka.com:9092"
 export KAFKA_USERNAME="bongko"
 export KAFKA_PASSWORD="P@ssw0rd"
 ```
@@ -140,7 +140,7 @@ Stored in Kubernetes Secret `molen-secrets`:
 - Elasticsearch credentials
 - Redis connection URL
 - S3/R2 credentials
-- Redpanda credentials
+- Kafka credentials
 
 **Never commit secrets to git!** Use the template and create secrets via kubectl or GitHub Secrets.
 

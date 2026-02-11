@@ -8,7 +8,7 @@ import {
 } from './kafka-broker.interface';
 
 /**
- * Mock implementation of Redpanda broker client for testing
+ * Mock implementation of Kafka broker client for testing
  */
 export class MockKafkaBrokerClient implements IKafkaBrokerClient {
   private topics: Map<string, TopicConfig> = new Map();
