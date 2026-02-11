@@ -34,6 +34,11 @@ export S3_ACCESS_KEY_ID="your-access-key"
 export S3_SECRET_ACCESS_KEY="your-secret-key"
 export S3_BUCKET="ml-models"
 
+export REDPANDA_BROKERS="broker1:9092,broker2:9092"
+export REDPANDA_USERNAME="your-username"
+export REDPANDA_PASSWORD="your-password"
+export REDPANDA_SASL_MECHANISM="scram-sha-256"
+
 # Run integration tests
 bun test tests/integration
 ```
@@ -50,8 +55,18 @@ Credentials are stored as GitHub repository secrets:
 - `FLINK_URL`, `FLINK_CLIENT_ID`, `FLINK_CLIENT_SECRET`
 - `REDIS_URL`
 - `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`
+- `REDPANDA_BROKERS`, `REDPANDA_USERNAME`, `REDPANDA_PASSWORD`, `REDPANDA_SASL_MECHANISM`
 
 ## Test Coverage
+
+### Redpanda Broker (redpanda-broker.integration.test.ts)
+- Connection with SASL authentication (SCRAM-SHA-256/512)
+- Topic creation and deletion
+- Topic metadata retrieval
+- Message production (single and batch)
+- Message consumption with consumer groups
+- Topic listing
+- **Note**: Tests clean up after themselves by deleting test topics
 
 ### Elasticsearch (elastic.integration.test.ts)
 - Connection with basic authentication
@@ -80,6 +95,18 @@ Credentials are stored as GitHub repository secrets:
 - **Note**: Tests clean up after themselves
 
 ## Credentials Format
+
+### Redpanda Broker (Kafka API)
+- Brokers: Comma-separated list `broker1:9092,broker2:9092`
+- Auth: SASL with SCRAM-SHA-256 or SCRAM-SHA-512
+- SSL: Required (enabled by default)
+- Example: 
+  ```
+  REDPANDA_BROKERS=d65uo0rt489913vpjspg.any.ap-southeast-1.mpx.prd.cloud.redpanda.com:9092
+  REDPANDA_USERNAME=bongko
+  REDPANDA_PASSWORD=your-password
+  REDPANDA_SASL_MECHANISM=scram-sha-256
+  ```
 
 ### Elasticsearch
 - URL: `https://elastic.bongko.id/`

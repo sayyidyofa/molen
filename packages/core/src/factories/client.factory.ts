@@ -12,6 +12,9 @@ import { RealS3Client } from '../clients/s3.real';
 import { MockS3Client } from '../clients/s3.mock';
 import { IRedpandaConnectClient } from '../clients/redpanda.interface';
 import { MockRedpandaConnectClient } from '../clients/redpanda.mock';
+import { IRedpandaBrokerClient } from '../clients/redpanda-broker.interface';
+import { RealRedpandaBrokerClient } from '../clients/redpanda-broker.real';
+import { MockRedpandaBrokerClient } from '../clients/redpanda-broker.mock';
 import { IMLTrainer } from '../clients/mltrainer.interface';
 import { MockMLTrainer } from '../clients/mltrainer.mock';
 
@@ -110,6 +113,38 @@ export class ExternalClientFactory {
     // Real implementation will be added later
     // For now, return mock even in production until real client is implemented
     return new MockRedpandaConnectClient({ apiUrl, apiKey });
+  }
+
+  /**
+   * Create a Redpanda broker client for Kafka API access
+   * Uses mock implementation when USE_MOCKS=true
+   * Provides direct access to Redpanda message streaming
+   */
+  static createRedpandaBrokerClient(): IRedpandaBrokerClient {
+    if (process.env.USE_MOCKS === 'true') {
+      return new MockRedpandaBrokerClient({
+        brokers: ['localhost:9092'],
+      });
+    }
+
+    const brokers = (process.env.REDPANDA_BROKERS || 'localhost:9092').split(',');
+    const username = process.env.REDPANDA_USERNAME;
+    const password = process.env.REDPANDA_PASSWORD;
+    const saslMechanism = process.env.REDPANDA_SASL_MECHANISM as 'plain' | 'scram-sha-256' | 'scram-sha-512' | undefined;
+
+    if (!username || !password) {
+      throw new Error('Redpanda credentials not provided. Set REDPANDA_USERNAME and REDPANDA_PASSWORD environment variables.');
+    }
+
+    return new RealRedpandaBrokerClient({
+      brokers,
+      ssl: true,
+      sasl: {
+        mechanism: saslMechanism || 'scram-sha-256',
+        username,
+        password,
+      },
+    });
   }
 
   /**

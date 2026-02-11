@@ -10,6 +10,14 @@ export {
   PipelineStatus,
 } from './clients/redpanda.interface';
 export {
+  IRedpandaBrokerClient,
+  RedpandaBrokerConfig,
+  TopicConfig,
+  ProducerMessage,
+  ConsumerMessage,
+  TopicMetadata,
+} from './clients/redpanda-broker.interface';
+export {
   IMLTrainer,
   TrainingConfig,
   TrainingJob,
@@ -27,6 +35,8 @@ export { MockFlinkClient } from './clients/flink.mock';
 export { RealS3Client } from './clients/s3.real';
 export { MockS3Client } from './clients/s3.mock';
 export { MockRedpandaConnectClient } from './clients/redpanda.mock';
+export { RealRedpandaBrokerClient } from './clients/redpanda-broker.real';
+export { MockRedpandaBrokerClient } from './clients/redpanda-broker.mock';
 export { MockMLTrainer } from './clients/mltrainer.mock';
 
 // Rule evaluator interfaces
