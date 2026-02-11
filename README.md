@@ -1,99 +1,174 @@
-# Fraud-Ops Control Plane
+# Molen: Self-Service Fraud-Ops Platform
 
-High-performance fraud detection orchestration system built with Bun, ElysiaJS, React, and Vite.
+**Internal Developer Platform (IDP) for Fraud Strategy Analysts**
+
+Molen empowers fraud analysts to train, test, and deploy ML fraud detection models without writing code. Built on Redpanda + Redpanda Connect for flexible, high-performance stream processing.
+
+## 🎯 Key Features
+
+### Self-Service ML Lifecycle
+- **Train Models:** Select date ranges, configure hyperparameters, submit training jobs
+- **Shadow Mode:** Test candidate models alongside live without production impact
+- **Model Comparison:** Compare accuracy, precision, recall, and false positive rates
+- **One-Click Promotion:** Promote candidate to live when metrics improve
+
+### Real-Time Fraud Detection
+- **15-30ms Latency:** End-to-end transaction processing
+- **Redpanda Connect:** Declarative YAML-based waterfall pipelines
+- **Dynamic Reloading:** Update rules without downtime
+- **Comprehensive Audit:** Full trail of model deployments and decisions
 
 ## Architecture
 
-This project uses a **monorepo architecture** with the following packages:
+**V2.0: Self-Service Platform**
+
+This project uses a **monorepo architecture** with a self-service ML platform:
 
 - **packages/core**: Shared logic, types, and Interface Factory implementations
-- **packages/api**: Bun-powered ElysiaJS backend
-- **packages/ui**: React/Vite frontend dashboard
+- **packages/api**: Bun-powered ElysiaJS backend with ML training services
+- **packages/ui**: React/Vite dashboard for analysts
 - **packages/config**: Shared ESLint, TSConfig, and environment configurations
 
-## Key Features
+### Technology Stack
 
-### Interface Factory Pattern
-The system implements the Interface Factory Pattern for:
-- **Rule Evaluation** (Stateless and Velocity evaluators)
-- **External Service Clients** (Elasticsearch, Redis, Flink, S3)
-- Mock implementations for testing
+- **Message Broker:** Redpanda (Kafka-compatible, high-performance)
+- **Stream Processing:** Redpanda Connect (declarative YAML pipelines)
+- **API:** Bun + ElysiaJS (3x faster than Node.js)
+- **UI:** React + Vite
+- **ML Storage:** Garage S3 (training data) + Cloudflare R2 (models)
+- **Analytics:** Elasticsearch + Kibana
+- **State:** Redis (velocity counters)
+- **Metadata:** Postgres
 
-### ML Model Storage
-- **S3-Compatible Storage** for ML models using Cloudflare R2
-- Supports model versioning and metadata
-- Integration with Flink for training and inference workflows
-- See [S3_STORAGE_GUIDE.md](S3_STORAGE_GUIDE.md) for details
+See [SELF_SERVICE_ARCHITECTURE.md](./SELF_SERVICE_ARCHITECTURE.md) for detailed architecture diagrams.
 
-### Shadow Mode (REQ-1.2)
-Toggle shadow mode to log fraud scores without interrupting live transaction flow.
+## Quick Start
 
-### Dashboard Components
-1. **Waterfall Monitor** (REQ-3.1): Real-time transaction flow visualization
-2. **Rule Editor** (REQ-3.2): Update Postgres-stored thresholds with LavinMQ broadcast
-3. **Case Triage** (REQ-3.3): View and investigate flagged transactions
+See [SELF_SERVICE_QUICKSTART.md](./SELF_SERVICE_QUICKSTART.md) for detailed setup instructions.
 
-## Prerequisites
+### Prerequisites
 
 - [Bun](https://bun.sh/) >= 1.0.0
+- Docker and Docker Compose
 
-## Installation
+### Installation
 
 ```bash
-# Install dependencies
+git clone https://github.com/sayyidyofa/molen.git
+cd molen
 bun install
 ```
 
-## Environment Variables
+### Environment Setup
 
-Create a `.env` file in the root directory:
+Create `.env` file:
 
 ```env
-# API Configuration
+# API
 PORT=3000
 SHADOW_MODE=false
 
-# External Services
-ELASTIC_URL=https://elasticsearch:9200
-REDIS_HOST=localhost
-REDIS_PORT=6379
-FLINK_API_URL=http://localhost:8081
+# Redpanda
+REDPANDA_BROKER_URL=localhost:9092
+REDPANDA_CONNECT_URL=http://localhost:4195
 
-# Security (REQ-2.3, NFR-1.2)
-CA_CERT_PATH=/path/to/homelab-ca.crt
+# Storage
+GARAGE_ENDPOINT=https://garage.internal:3900
+S3_ENDPOINT=https://r2.cloudflarestorage.com
+
+# Analytics
+ELASTIC_URL=https://elastic.bongko.id/
+REDIS_URL=redis://localhost:6379
 
 # Testing
 USE_MOCKS=true
 ```
 
-## Development
-
-### Run all services in development mode
+### Start Services
 
 ```bash
-# Terminal 1: Run API server
+# Start infrastructure
+docker-compose up -d
+
+# Terminal 1: API
 bun run dev:api
 
-# Terminal 2: Run UI development server
+# Terminal 2: UI
 bun run dev:ui
 ```
 
-The API will be available at `http://localhost:3000` and the UI at `http://localhost:5173`.
+Access:
+- **API:** http://localhost:3000
+- **UI:** http://localhost:5173
 
-### Run individual packages
+## The "Molen Path" - Analyst Workflow
 
+```
+1. EXTRACT   → Select 7-day data window from Garage
+2. TRAIN     → Configure & submit XGBoost/LightGBM training
+3. EVALUATE  → Deploy candidate in Shadow Mode (48-72 hours)
+4. COMPARE   → View Live vs Candidate metrics dashboard
+5. PROMOTE   → One-click promotion if FP rate improves
+```
+
+See [SELF_SERVICE_QUICKSTART.md](./SELF_SERVICE_QUICKSTART.md) for step-by-step guide.
+
+## Key Features
+
+### Self-Service Model Training (REQ-1)
+Train fraud detection models without code:
+- Select date ranges from historical data
+- Configure model type (XGBoost, LightGBM, scikit-learn)
+- Submit training job via UI
+- Monitor progress in real-time
+- View training metrics (accuracy, F1, AUC)
+
+**API Endpoints:**
 ```bash
-# Core package
-cd packages/core
-bun test
+POST /ml/training          # Submit training job
+GET  /ml/training/:jobId   # Get training status
+GET  /ml/models            # List all models
+```
 
-# API package
-cd packages/api
-bun run dev
+### Shadow Mode Deployment (REQ-2)
+Test models safely before production:
+- Candidate runs alongside live model
+- Both predictions logged (no production impact)
+- Compare false positive rates
+- Agreement rate analysis
+- Promote when metrics improve
 
-# UI package
-cd packages/ui
-bun run dev
+**API Endpoints:**
+```bash
+GET  /ml/models/compare    # Compare models
+POST /ml/models/:id/promote # Promote to live
+```
+
+### Declarative Rule Management (REQ-3)
+Update fraud rules via UI:
+- YAML-based Redpanda Connect pipelines
+- Dynamic reload without downtime
+- Version control for rule changes
+- Audit trail of modifications
+
+**API Endpoints:**
+```bash
+GET  /rules               # List rules
+PUT  /rules/:id           # Update rule
+POST /rules/publish       # Reload pipeline
+```
+
+### Alert Triage & Audit (REQ-4)
+Investigate flagged transactions:
+- Search alerts by score, date, model version
+- Enrichment data from external services
+- Complete audit trail with user IDs
+- Model version tracking per decision
+
+**API Endpoints:**
+```bash
+GET  /triage/cases        # List flagged transactions
+GET  /triage/cases/:id    # Case details with audit trail
 ```
 
 ## Testing
