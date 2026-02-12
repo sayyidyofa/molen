@@ -6,7 +6,7 @@ import {
   DeleteObjectCommand,
   HeadObjectCommand,
 } from '@aws-sdk/client-s3';
-import { IS3Client } from './s3.interface';
+import { IS3Client, UploadModelResponse } from './s3.interface';
 
 /**
  * Real S3 client implementation for ML model storage
@@ -39,7 +39,7 @@ export class RealS3Client implements IS3Client {
     key: string,
     data: Buffer | string,
     metadata?: Record<string, string>
-  ): Promise<any> {
+  ): Promise<UploadModelResponse> {
     const buffer = typeof data === 'string' ? Buffer.from(data) : data;
     
     const command = new PutObjectCommand({

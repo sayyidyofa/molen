@@ -2,6 +2,12 @@
  * S3-compatible storage client interface for ML model storage
  * Supports Cloudflare R2 and other S3-compatible endpoints
  */
+
+export interface UploadModelResponse {
+  ETag?: string;
+  VersionId?: string;
+}
+
 export interface IS3Client {
   /**
    * Upload a model file to storage
@@ -10,7 +16,7 @@ export interface IS3Client {
    * @param metadata - Optional metadata to attach to the object
    * @returns Promise with upload result
    */
-  uploadModel(key: string, data: Buffer | string, metadata?: Record<string, string>): Promise<any>;
+  uploadModel(key: string, data: Buffer | string, metadata?: Record<string, string>): Promise<UploadModelResponse>;
 
   /**
    * Download a model file from storage

@@ -65,7 +65,9 @@ DROP TABLE IF EXISTS users;
 /**
  * Initialize database schema
  */
-export async function initializeAuthSchema(sql: any): Promise<void> {
+import type { Sql } from 'postgres';
+
+export async function initializeAuthSchema(sql: Sql): Promise<void> {
   await sql.unsafe(createAuthSchema);
   console.log('✅ Authentication schema initialized');
 }
@@ -73,7 +75,7 @@ export async function initializeAuthSchema(sql: any): Promise<void> {
 /**
  * Drop database schema (for testing or cleanup)
  */
-export async function dropAuthSchemaIfExists(sql: any): Promise<void> {
+export async function dropAuthSchemaIfExists(sql: Sql): Promise<void> {
   await sql.unsafe(dropAuthSchema);
   console.log('✅ Authentication schema dropped');
 }

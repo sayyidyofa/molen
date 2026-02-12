@@ -1,6 +1,6 @@
-import { Client } from '@elastic/elasticsearch';
+import { Client, ClientOptions } from '@elastic/elasticsearch';
 import { readFileSync } from 'fs';
-import { IElasticClient } from './elastic.interface';
+import { IElasticClient, ElasticsearchResponse, SearchParams, IndexParams } from './elastic.interface';
 
 /**
  * Real Elasticsearch client implementation with SSL/TLS support
@@ -14,7 +14,7 @@ export class RealElasticClient implements IElasticClient {
     username?: string;
     password?: string;
   }) {
-    const clientConfig: any = {
+    const clientConfig: ClientOptions = {
       node: config.node,
     };
 
@@ -42,12 +42,24 @@ export class RealElasticClient implements IElasticClient {
     this.client = new Client(clientConfig);
   }
 
-  async search(params: object): Promise<any> {
-    return await this.client.search(params as any);
+  async search<T = unknown>(params: SearchParams): Promise<ElasticsearchResponse<T>> {
+    const result = await this.client.search({
+      index: params.index,
+      ...params.body,
+    });
+    return result as unknown as ElasticsearchResponse<T>;
   }
 
-  async index(params: object): Promise<any> {
-    return await this.client.index(params as any);
+  async index(params: IndexParams): Promise<{ result: string; _id: string }> {
+    const result = await this.client.index({
+      index: params.index,
+      id: params.id,
+      document: params.document,
+    });
+    return {
+      result: result.result,
+      _id: result._id,
+    };
   }
 
   async close(): Promise<void> {

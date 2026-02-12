@@ -93,7 +93,7 @@ export function requireAuth() {
 /**
  * Set session cookie
  */
-export function setSessionCookie(cookie: any, sessionId: string) {
+export function setSessionCookie(cookie: Record<string, any>, sessionId: string) {
   const config = getSessionCookieConfig();
   
   cookie[SESSION_COOKIE_NAME].set({
@@ -109,6 +109,6 @@ export function setSessionCookie(cookie: any, sessionId: string) {
 /**
  * Clear session cookie
  */
-export function clearSessionCookie(cookie: any) {
+export function clearSessionCookie(cookie: Record<string, any>) {
   cookie[SESSION_COOKIE_NAME].remove();
 }

@@ -1,4 +1,4 @@
-import { IS3Client } from './s3.interface';
+import { IS3Client, UploadModelResponse } from './s3.interface';
 
 /**
  * Mock S3 client for testing
@@ -11,7 +11,7 @@ export class MockS3Client implements IS3Client {
     key: string,
     data: Buffer | string,
     metadata?: Record<string, string>
-  ): Promise<any> {
+  ): Promise<UploadModelResponse> {
     const buffer = typeof data === 'string' ? Buffer.from(data) : data;
     this.storage.set(key, { data: buffer, metadata });
     return {

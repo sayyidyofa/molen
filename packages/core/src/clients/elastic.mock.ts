@@ -1,12 +1,12 @@
-import { IElasticClient } from './elastic.interface';
+import { IElasticClient, ElasticsearchResponse, SearchParams, IndexParams } from './elastic.interface';
 
 /**
  * Mock Elasticsearch client for testing without external dependencies
  */
 export class MockElasticClient implements IElasticClient {
-  private mockData: Map<string, any[]> = new Map();
+  private mockData: Map<string, unknown[]> = new Map();
 
-  async search(params: any): Promise<any> {
+  async search<T = unknown>(params: SearchParams): Promise<ElasticsearchResponse<T>> {
     const index = params.index || 'default';
     const data = this.mockData.get(index) || [];
     
@@ -14,22 +14,20 @@ export class MockElasticClient implements IElasticClient {
       hits: {
         total: { value: data.length },
         hits: data.map((doc, i) => ({
-          _index: index,
           _id: `mock-${i}`,
-          _source: doc,
+          _source: doc as T,
         })),
       },
     };
   }
 
-  async index(params: any): Promise<any> {
+  async index(params: IndexParams): Promise<{ result: string; _id: string }> {
     const index = params.index || 'default';
     const data = this.mockData.get(index) || [];
-    data.push(params.document || params.body);
+    data.push(params.document);
     this.mockData.set(index, data);
 
     return {
-      _index: index,
       _id: `mock-${data.length}`,
       result: 'created',
     };
