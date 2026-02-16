@@ -43,7 +43,7 @@ export class TriageService {
       total: result.hits.total.value,
       cases: result.hits.hits.map((hit: any) => ({
         id: hit._id,
-        ...hit._source,
+        ...(hit._source as object),
       })) as FlaggedCase[],
     };
   }
@@ -65,7 +65,7 @@ export class TriageService {
 
     return {
       id: result.hits.hits[0]._id,
-      ...result.hits.hits[0]._source,
+      ...(result.hits.hits[0]._source as object),
     } as FlaggedCase;
   }
 }

@@ -32,8 +32,10 @@ export class ExternalClientFactory {
     
     const node = process.env.ELASTIC_URL || process.env.INDEX_URL || 'http://localhost:9200';
     const caPath = process.env.CA_CERT_PATH;
+    const username = process.env.ELASTIC_USERNAME;
+    const password = process.env.ELASTIC_PASSWORD;
     
-    return new RealElasticClient({ node, caPath });
+    return new RealElasticClient({ node, caPath, username, password });
   }
 
   /**
@@ -45,10 +47,15 @@ export class ExternalClientFactory {
       return new MockRedisClient();
     }
 
+    if (process.env.REDIS_URL) {
+      return new RealRedisClient({ url: process.env.REDIS_URL });
+    }
+
     const host = process.env.REDIS_HOST || 'localhost';
     const port = parseInt(process.env.REDIS_PORT || '6379', 10);
+    const password = process.env.REDIS_PASSWORD;
     
-    return new RealRedisClient({ host, port });
+    return new RealRedisClient({ host, port, password });
   }
 
 

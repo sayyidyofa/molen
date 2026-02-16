@@ -6,7 +6,7 @@ import {
   DeleteObjectCommand,
   HeadObjectCommand,
 } from '@aws-sdk/client-s3';
-import { IS3Client, UploadModelResponse } from './s3.interface';
+import { IS3Client, UploadModelResponse, S3Config } from './s3.interface';
 
 /**
  * Real S3 client implementation for ML model storage
@@ -16,13 +16,7 @@ export class RealS3Client implements IS3Client {
   private client: S3Client;
   private bucket: string;
 
-  constructor(config: {
-    endpoint: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-    bucket: string;
-    region?: string;
-  }) {
+  constructor(config: S3Config) {
     this.bucket = config.bucket;
     
     this.client = new S3Client({

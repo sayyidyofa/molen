@@ -12,7 +12,6 @@ import {
   type OAuth2LoginData,
   type SafeUser,
   type User,
-  hashPassword,
   verifyPassword,
   validatePasswordStrength,
 } from '@molen/core';
@@ -235,7 +234,7 @@ export class AuthService {
    * Convert User to SafeUser (remove password_hash)
    */
   private toSafeUser(user: User): SafeUser {
-    const { password_hash, ...safeUser } = user;
+    const { password_hash: _password_hash, ...safeUser } = user;
     return safeUser;
   }
 

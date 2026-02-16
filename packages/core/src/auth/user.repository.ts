@@ -94,12 +94,6 @@ export class PostgresUserRepository implements IUserRepository {
       updates.is_active = payload.is_active;
     }
 
-    const setClause = Object.keys(updates)
-      .map((key, idx) => `${key} = $${idx + 2}`)
-      .join(', ');
-
-    const values = [id, ...Object.values(updates)];
-
     const [user] = await this.sql<User[]>`
       UPDATE users 
       SET ${this.sql(updates)}

@@ -8,6 +8,23 @@ export interface UploadModelResponse {
   VersionId?: string;
 }
 
+export interface S3Config {
+  endpoint: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  bucket: string;
+  region?: string;
+}
+
+export interface ModelMetadata {
+  modelName: string;
+  version: string;
+  accuracy: number;
+  f1Score: number;
+  trainedAt: string;
+  datasetRange: string;
+}
+
 export interface IS3Client {
   /**
    * Upload a model file to storage

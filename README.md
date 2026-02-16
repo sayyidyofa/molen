@@ -86,9 +86,32 @@ USE_MOCKS=true
 
 ### Start Services
 
+#### Using Docker (Recommended)
+
+Molen provides separated Docker Compose files for better flexibility:
+- `docker-compose.yml`: Contains Molen application services (API and UI).
+- `docker-compose.infra.yml`: Contains infrastructure services (Postgres, Redis, Elastic, Kafka).
+
+**Option 1: Start everything (App + Local Infra)**
+```bash
+# Start infrastructure first
+docker-compose -f docker-compose.infra.yml up -d
+
+# Start Molen services
+docker-compose up -d --build
+```
+
+**Option 2: Start only Molen services (using external infra from .env)**
+```bash
+# Configure .env with your external credentials/URLs
+docker-compose up -d --build
+```
+
+#### Manual Start
+
 ```bash
 # Start infrastructure
-docker-compose up -d
+docker-compose up -d postgres redis elasticsearch kafka kafka-connect
 
 # Terminal 1: API
 bun run dev:api
@@ -215,6 +238,21 @@ bun run lint:fix
 ```
 
 ## Building for Production
+
+### Using Docker
+
+Molen uses separated Docker Compose files for the application and infrastructure.
+
+```bash
+# Build all application images
+docker-compose build
+
+# Or build individually
+docker build -t molen-api -f packages/api/Dockerfile .
+docker build -t molen-ui -f packages/ui/Dockerfile .
+```
+
+### Manual Build
 
 ```bash
 # Build all packages

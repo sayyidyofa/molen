@@ -28,6 +28,12 @@ export class RedisSessionStore implements ISessionStore {
 
   constructor(config: SessionConfig) {
     this.redis = new Redis(config.redisUrl);
+    
+    // Add error handler to prevent "Unhandled error event" crashes
+    this.redis.on('error', (err) => {
+      console.error('Redis Session Store Error:', err);
+    });
+
     this.prefix = config.prefix || 'session:';
     this.defaultTTL = config.ttl || DEFAULT_SESSION_TTL;
     this.renewOnAccess = config.renewOnAccess ?? true;

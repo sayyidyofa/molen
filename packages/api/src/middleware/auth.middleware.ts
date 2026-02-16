@@ -39,8 +39,8 @@ export function getSessionCookieConfig(): SessionCookieConfig {
  * Create authentication middleware
  */
 export function createAuthMiddleware(sessionStore: ISessionStore) {
-  return new Elysia()
-    .derive(async ({ cookie, set }) => {
+  return new Elysia({ name: 'auth-middleware' })
+    .derive(async ({ cookie }) => {
       const sessionId = cookie[SESSION_COOKIE_NAME]?.value;
       
       if (!sessionId) {
@@ -79,8 +79,8 @@ export function createAuthMiddleware(sessionStore: ISessionStore) {
  * Require authentication guard
  */
 export function requireAuth() {
-  return new Elysia()
-    .derive(({ user, isAuthenticated, set }) => {
+  return new Elysia({ name: 'require-auth' })
+    .derive(({ user, isAuthenticated, set }: any) => {
       if (!isAuthenticated || !user) {
         set.status = 401;
         throw new Error('Authentication required');

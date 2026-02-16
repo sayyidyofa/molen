@@ -18,6 +18,11 @@ export class RealRedisClient implements IRedisClient {
         password: config.password,
       });
     }
+
+    // Add error handler to prevent "Unhandled error event" crashes
+    this.client.on('error', (err) => {
+      console.error('Redis Client Error:', err);
+    });
   }
 
   async get(key: string): Promise<string | null> {

@@ -4,12 +4,12 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 
 # Copy workspace files
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock ./
 COPY packages/config ./packages/config
 COPY packages/ui ./packages/ui
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Build UI
 WORKDIR /app/packages/ui

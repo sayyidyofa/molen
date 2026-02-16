@@ -16,7 +16,6 @@ export class MockS3Client implements IS3Client {
     this.storage.set(key, { data: buffer, metadata });
     return {
       ETag: `"mock-etag-${Date.now()}"`,
-      Key: key,
     };
   }
 

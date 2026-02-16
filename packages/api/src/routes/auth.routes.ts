@@ -3,7 +3,7 @@
  * Handles user registration, login (email/password and OAuth2), logout
  */
 
-import { Elysia, t } from 'elysia';
+import { t } from 'elysia';
 import { nanoid } from 'nanoid';
 import type { AuthService } from '../services/auth.service';
 import { setSessionCookie, clearSessionCookie, requireAuth } from '../middleware/auth.middleware';
@@ -11,12 +11,12 @@ import { setSessionCookie, clearSessionCookie, requireAuth } from '../middleware
 /**
  * Register authentication routes
  */
-export function authRoutes(app: Elysia, authService: AuthService) {
+export function authRoutes(app: any, authService: AuthService) {
   return app
     // POST /auth/register - Register new user
     .post(
       '/auth/register',
-      async ({ body, cookie, set }) => {
+      async ({ body, cookie, set }: any) => {
         try {
           const { email, password, fullName } = body;
 
@@ -50,7 +50,7 @@ export function authRoutes(app: Elysia, authService: AuthService) {
     // POST /auth/login - Login with email/password
     .post(
       '/auth/login',
-      async ({ body, cookie, set }) => {
+      async ({ body, cookie, set }: any) => {
         try {
           const result = await authService.login(body);
 
@@ -81,7 +81,7 @@ export function authRoutes(app: Elysia, authService: AuthService) {
     // POST /auth/logout - Logout current session
     .post(
       '/auth/logout',
-      async ({ cookie, sessionId }) => {
+      async ({ cookie, sessionId }: any) => {
         if (sessionId) {
           await authService.logout(sessionId);
         }
@@ -100,7 +100,7 @@ export function authRoutes(app: Elysia, authService: AuthService) {
     .use(requireAuth())
     .post(
       '/auth/logout-all',
-      async ({ user, cookie }) => {
+      async ({ user, cookie }: any) => {
         const count = await authService.logoutAllSessions(user.id);
 
         // Clear current session cookie
@@ -116,7 +116,7 @@ export function authRoutes(app: Elysia, authService: AuthService) {
 
     // GET /auth/me - Get current user
     .use(requireAuth())
-    .get('/auth/me', async ({ user }) => {
+    .get('/auth/me', async ({ user }: any) => {
       return {
         success: true,
         user,
@@ -127,7 +127,7 @@ export function authRoutes(app: Elysia, authService: AuthService) {
     .use(requireAuth())
     .post(
       '/auth/password',
-      async ({ user, body, set }) => {
+      async ({ user, body, set }: any) => {
         try {
           await authService.updatePassword(user.id, body.currentPassword, body.newPassword);
 
@@ -152,7 +152,7 @@ export function authRoutes(app: Elysia, authService: AuthService) {
     )
 
     // GET /auth/oauth2/authorize - Initiate OAuth2 flow
-    .get('/auth/oauth2/authorize', ({ set, query }) => {
+    .get('/auth/oauth2/authorize', ({ set }: any) => {
       try {
         // Generate state for CSRF protection
         const state = nanoid(32);
@@ -174,9 +174,9 @@ export function authRoutes(app: Elysia, authService: AuthService) {
     })
 
     // GET /auth/oauth2/callback - Handle OAuth2 callback
-    .get('/auth/oauth2/callback', async ({ query, cookie, set }) => {
+    .get('/auth/oauth2/callback', async ({ query, cookie, set }: any) => {
       try {
-        const { code, state } = query;
+        const { code } = query;
 
         if (!code) {
           throw new Error('Authorization code not provided');

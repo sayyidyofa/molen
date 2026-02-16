@@ -55,8 +55,25 @@ REDIS_URL=redis://default:password@redis.example.com:12394
 
 ### 3. Start Infrastructure (Docker)
 
+Molen provides separated Docker Compose files for infrastructure and application services.
+
+To start only the infrastructure (Postgres, Redis, Elastic, Kafka):
 ```bash
-docker-compose up -d kafka kafka-connect
+docker-compose -f docker-compose.infra.yml up -d
+```
+
+To start the entire platform (including API and UI):
+```bash
+# Start infra
+docker-compose -f docker-compose.infra.yml up -d
+
+# Start app
+docker-compose up -d --build
+```
+
+If you are using external services (configured in `.env`), you can start only the Molen services:
+```bash
+docker-compose up -d --build
 ```
 
 ### 4. Start Molen Services

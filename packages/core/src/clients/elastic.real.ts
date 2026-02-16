@@ -1,5 +1,5 @@
 import { Client, ClientOptions } from '@elastic/elasticsearch';
-import { readFileSync } from 'fs';
+import { readFileSync, statSync } from 'fs';
 import { IElasticClient, ElasticsearchResponse, SearchParams, IndexParams } from './elastic.interface';
 
 /**
@@ -29,13 +29,21 @@ export class RealElasticClient implements IElasticClient {
     // Add SSL/TLS configuration if CA certificate path is provided (REQ-2.3)
     if (config.caPath) {
       try {
-        clientConfig.tls = {
-          ca: readFileSync(config.caPath),
-          rejectUnauthorized: true,
-        };
+        const stats = statSync(config.caPath);
+        if (stats.isFile()) {
+          clientConfig.tls = {
+            ca: readFileSync(config.caPath),
+            rejectUnauthorized: true,
+          };
+        } else {
+          console.warn(`CA_CERT_PATH points to a ${stats.isDirectory() ? 'directory' : 'non-file'} instead of a certificate file: ${config.caPath}. Skipping CA certificate loading.`);
+        }
       } catch (error) {
         console.error(`Failed to load CA certificate from ${config.caPath}:`, error);
-        throw error;
+        // Don't throw if it's just missing, but log it
+        if ((error as any).code !== 'ENOENT') {
+          throw error;
+        }
       }
     }
 

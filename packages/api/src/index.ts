@@ -11,7 +11,6 @@ import postgres from 'postgres';
 import { WaterfallService } from './services/waterfall.service';
 import { RuleService } from './services/rule.service';
 import { TriageService } from './services/triage.service';
-import { MLService } from './services/ml.service';
 import { AuthService } from './services/auth.service';
 import { waterfallRoutes } from './routes/waterfall.routes';
 import { ruleRoutes } from './routes/rule.routes';
@@ -61,12 +60,13 @@ const authService = new AuthService(userRepository, sessionStore, oauth2Client);
 const waterfallService = new WaterfallService(config.shadowMode);
 const ruleService = new RuleService();
 const triageService = new TriageService();
-const mlService = new MLService();
 
 // Initialize database schema
-initializeAuthSchema(sql).catch((error) => {
+try {
+  await initializeAuthSchema(sql);
+} catch (error) {
   console.error('Failed to initialize auth schema:', error);
-});
+}
 
 // Create Elysia app
 const app = new Elysia()

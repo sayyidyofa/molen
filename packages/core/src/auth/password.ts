@@ -12,12 +12,12 @@ import * as argon2 from 'argon2';
 /**
  * Argon2id configuration (OWASP recommended settings)
  */
-const ARGON2_OPTIONS: argon2.Options = {
+const ARGON2_OPTIONS = {
   type: argon2.argon2id, // Hybrid of Argon2i and Argon2d
   memoryCost: 65536, // 64 MiB memory cost
   timeCost: 3, // 3 iterations
   parallelism: 4, // 4 parallel threads
-};
+} as const;
 
 /**
  * Hash a password using Argon2id
@@ -82,7 +82,7 @@ export function validatePasswordStrength(password: string): string | null {
   const hasLowercase = /[a-z]/.test(password);
   const hasUppercase = /[A-Z]/.test(password);
   const hasDigit = /[0-9]/.test(password);
-  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
   
   const strength = [hasLowercase, hasUppercase, hasDigit, hasSpecial].filter(Boolean).length;
   

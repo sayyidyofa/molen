@@ -15,6 +15,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "..",
+    "paths": {
+      "@molen/core": ["core/src/index.ts"],
+      "@molen/core/*": ["core/src/*"]
+    }
   }
 }

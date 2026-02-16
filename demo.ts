@@ -58,7 +58,7 @@ async function main() {
     hyperparameters: { maxDepth: 6, learningRate: 0.1 },
   });
   console.log(`   ✓ Training job submitted: ${trainingJob.jobId}`);
-  console.log(`   Status: ${trainingJob.status}\n');
+  console.log(`   Status: ${trainingJob.status}\n`);
 
   console.log('   Step 3: Upload trained model to S3...');
   const modelData = Buffer.from('xgboost-model-binary');

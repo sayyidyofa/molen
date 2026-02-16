@@ -49,7 +49,7 @@ export class OAuth2Client implements IOAuth2Client {
       throw new Error(`Failed to exchange code for token: ${error}`);
     }
 
-    return response.json();
+    return (await response.json()) as OAuth2TokenResponse;
   }
 
   async getTokenByPassword(username: string, password: string): Promise<OAuth2TokenResponse> {
@@ -75,7 +75,7 @@ export class OAuth2Client implements IOAuth2Client {
       throw new Error(`Failed to get token by password: ${error}`);
     }
 
-    return response.json();
+    return (await response.json()) as OAuth2TokenResponse;
   }
 
   async getTokenByClientCredentials(): Promise<OAuth2TokenResponse> {
@@ -99,7 +99,7 @@ export class OAuth2Client implements IOAuth2Client {
       throw new Error(`Failed to get token by client credentials: ${error}`);
     }
 
-    return response.json();
+    return (await response.json()) as OAuth2TokenResponse;
   }
 
   async getUserInfo(accessToken: string): Promise<OAuth2UserInfo> {
@@ -114,7 +114,7 @@ export class OAuth2Client implements IOAuth2Client {
       throw new Error(`Failed to get user info: ${error}`);
     }
 
-    return response.json();
+    return (await response.json()) as OAuth2UserInfo;
   }
 
   async refreshToken(refreshToken: string): Promise<OAuth2TokenResponse> {
@@ -138,6 +138,6 @@ export class OAuth2Client implements IOAuth2Client {
       throw new Error(`Failed to refresh token: ${error}`);
     }
 
-    return response.json();
+    return (await response.json()) as OAuth2TokenResponse;
   }
 }

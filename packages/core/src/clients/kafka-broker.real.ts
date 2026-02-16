@@ -25,7 +25,7 @@ export class RealKafkaBrokerClient implements IKafkaBrokerClient {
       ssl: config.ssl ? {} : false,
       sasl: config.sasl
         ? {
-            mechanism: config.sasl.mechanism,
+            mechanism: config.sasl.mechanism as any,
             username: config.sasl.username,
             password: config.sasl.password,
           }

@@ -18,6 +18,4 @@ describe('ExternalClientFactory', () => {
     const client = ExternalClientFactory.createRedisClient();
     expect(client).toBeInstanceOf(MockRedisClient);
   });
-
-  });
 });
