@@ -6,3 +6,9 @@ dist
 coverage
 .idea
 .deploy.env
+
+# Rust artifacts
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
