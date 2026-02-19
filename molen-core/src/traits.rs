@@ -6,6 +6,7 @@
 
 use crate::types::{Decision, InferenceResult, ModelMetadata, Transaction};
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Provider for executing fraud detection inference
@@ -170,6 +171,99 @@ pub trait StateProvider: Send + Sync {
     async fn get_user_features(&self, user_id: &str) -> anyhow::Result<HashMap<String, f64>>;
 }
 
+/// Event/Alert for streaming
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Alert {
+    /// Alert identifier
+    pub alert_id: String,
+    
+    /// Transaction that triggered the alert
+    pub transaction_id: String,
+    
+    /// Inference result
+    pub result: InferenceResult,
+    
+    /// Timestamp when alert was generated
+    pub timestamp: i64,
+}
+
+/// Provider for real-time event streaming (Kafka/Redpanda)
+///
+/// This trait handles consuming transaction events and producing alerts
+/// to downstream systems
+#[async_trait]
+pub trait EventStreamProvider: Send + Sync {
+    /// Consume events from the stream
+    ///
+    /// # Arguments
+    /// * `topic` - Topic name to consume from
+    /// * `batch_size` - Maximum number of events to consume
+    ///
+    /// # Returns
+    /// * Vector of transactions
+    ///
+    /// # Errors
+    /// Returns an error if consumption fails
+    async fn consume_events(&self, topic: &str, batch_size: usize) -> anyhow::Result<Vec<Transaction>>;
+    
+    /// Produce an alert to the stream
+    ///
+    /// # Arguments
+    /// * `topic` - Topic name to produce to
+    /// * `alert` - Alert to send
+    ///
+    /// # Errors
+    /// Returns an error if production fails
+    async fn produce_alert(&self, topic: &str, alert: &Alert) -> anyhow::Result<()>;
+}
+
+/// Query parameters for analytics
+#[derive(Debug, Clone)]
+pub struct AlertQuery {
+    /// Start timestamp
+    pub start_time: i64,
+    
+    /// End timestamp
+    pub end_time: i64,
+    
+    /// Filter by decision
+    pub decision: Option<Decision>,
+    
+    /// Filter by user ID
+    pub user_id: Option<String>,
+    
+    /// Maximum results
+    pub limit: usize,
+}
+
+/// Provider for long-term analytics and triage (Elasticsearch)
+///
+/// This trait handles storing decisions for analysis and querying
+/// historical alerts for investigation
+#[async_trait]
+pub trait AnalyticsProvider: Send + Sync {
+    /// Index a decision for long-term storage
+    ///
+    /// # Arguments
+    /// * `result` - Inference result to index
+    ///
+    /// # Errors
+    /// Returns an error if indexing fails
+    async fn index_decision(&self, result: &InferenceResult) -> anyhow::Result<()>;
+    
+    /// Query alerts for triage
+    ///
+    /// # Arguments
+    /// * `query` - Query parameters
+    ///
+    /// # Returns
+    /// * Vector of inference results matching the query
+    ///
+    /// # Errors
+    /// Returns an error if query fails
+    async fn query_alerts(&self, query: &AlertQuery) -> anyhow::Result<Vec<InferenceResult>>;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -325,5 +419,113 @@ mod tests {
         };
         
         assert_eq!(provider.get_model_version(), "v2.1.0");
+    }
+
+    // Mock implementations for infrastructure providers
+    struct MockEventStreamProvider;
+
+    #[async_trait]
+    impl EventStreamProvider for MockEventStreamProvider {
+        async fn consume_events(&self, _topic: &str, _batch_size: usize) -> anyhow::Result<Vec<Transaction>> {
+            todo!("Implement event consumption from Kafka/Redpanda")
+        }
+
+        async fn produce_alert(&self, _topic: &str, _alert: &Alert) -> anyhow::Result<()> {
+            todo!("Implement alert production to Kafka/Redpanda")
+        }
+    }
+
+    struct MockAnalyticsProvider;
+
+    #[async_trait]
+    impl AnalyticsProvider for MockAnalyticsProvider {
+        async fn index_decision(&self, _result: &InferenceResult) -> anyhow::Result<()> {
+            todo!("Implement decision indexing to Elasticsearch")
+        }
+
+        async fn query_alerts(&self, _query: &AlertQuery) -> anyhow::Result<Vec<InferenceResult>> {
+            todo!("Implement alert querying from Elasticsearch")
+        }
+    }
+
+    #[tokio::test]
+    #[should_panic(expected = "not yet implemented")]
+    async fn test_event_stream_should_consume_events() {
+        let provider = MockEventStreamProvider;
+        
+        let events = provider
+            .consume_events("transactions", 10)
+            .await
+            .unwrap();
+        
+        // This should fail because the implementation uses todo!()
+        assert!(!events.is_empty());
+    }
+
+    #[tokio::test]
+    #[should_panic(expected = "not yet implemented")]
+    async fn test_event_stream_should_produce_alert() {
+        let provider = MockEventStreamProvider;
+        
+        let alert = Alert {
+            alert_id: "alert_123".to_string(),
+            transaction_id: "txn_456".to_string(),
+            result: InferenceResult {
+                transaction_id: "txn_456".to_string(),
+                fraud_score: 0.95,
+                decision: Decision::Block,
+                model_version: "v1.0.0".to_string(),
+                latency_ms: 20,
+                features: HashMap::new(),
+                triggered_rules: vec!["high_amount".to_string()],
+            },
+            timestamp: 1234567890,
+        };
+        
+        provider
+            .produce_alert("alerts", &alert)
+            .await
+            .unwrap();
+        
+        // This should fail because the implementation uses todo!()
+    }
+
+    #[tokio::test]
+    #[should_panic(expected = "not yet implemented")]
+    async fn test_analytics_should_index_decision() {
+        let provider = MockAnalyticsProvider;
+        
+        let result = InferenceResult {
+            transaction_id: "txn_123".to_string(),
+            fraud_score: 0.75,
+            decision: Decision::Flag,
+            model_version: "v1.0.0".to_string(),
+            latency_ms: 18,
+            features: HashMap::new(),
+            triggered_rules: vec![],
+        };
+        
+        provider.index_decision(&result).await.unwrap();
+        
+        // This should fail because the implementation uses todo!()
+    }
+
+    #[tokio::test]
+    #[should_panic(expected = "not yet implemented")]
+    async fn test_analytics_should_query_alerts() {
+        let provider = MockAnalyticsProvider;
+        
+        let query = AlertQuery {
+            start_time: 1000000,
+            end_time: 2000000,
+            decision: Some(Decision::Block),
+            user_id: None,
+            limit: 100,
+        };
+        
+        let results = provider.query_alerts(&query).await.unwrap();
+        
+        // This should fail because the implementation uses todo!()
+        assert!(!results.is_empty());
     }
 }

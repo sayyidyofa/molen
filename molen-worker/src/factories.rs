@@ -46,7 +46,7 @@ impl WorkerFactory {
     ///
     /// let provider = WorkerFactory::create_inference_provider(config);
     /// ```
-    pub fn create_inference_provider(config: WorkerConfig) -> Arc<dyn InferenceProvider> {
+    pub fn create_inference_provider(_config: WorkerConfig) -> Arc<dyn InferenceProvider> {
         todo!("Implement InferenceProvider factory based on config.provider_type")
     }
 
@@ -57,7 +57,7 @@ impl WorkerFactory {
     ///
     /// # Returns
     /// * Arc-wrapped mock InferenceProvider
-    pub fn create_mock_provider(model_version: String) -> Arc<dyn InferenceProvider> {
+    pub fn create_mock_provider(_model_version: String) -> Arc<dyn InferenceProvider> {
         todo!("Implement mock InferenceProvider creation")
     }
 }
@@ -110,7 +110,7 @@ impl StorageFactory {
     ///
     /// let provider = StorageFactory::create_storage_provider(config);
     /// ```
-    pub fn create_storage_provider(config: StorageConfig) -> Arc<dyn StorageProvider> {
+    pub fn create_storage_provider(_config: StorageConfig) -> Arc<dyn StorageProvider> {
         todo!("Implement StorageProvider factory for S3/Garage")
     }
 
