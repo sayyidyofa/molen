@@ -4,5 +4,7 @@
 //! for interacting with external services like S3, Redis, Kafka, etc.
 
 pub mod storage;
+pub mod state;
 
 pub use storage::RealStorageProvider;
+pub use state::RealStateProvider;
