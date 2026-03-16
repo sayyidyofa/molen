@@ -3,6 +3,7 @@
 //! This crate provides the foundational contracts (traits) and data structures
 //! used across the Molen fraud detection system.
 
+pub mod providers;
 pub mod traits;
 pub mod types;
 
@@ -12,3 +13,6 @@ pub use traits::{
     StorageProvider,
 };
 pub use types::{Decision, InferenceResult, ModelMetadata, Transaction};
+
+// Re-export provider implementations
+pub use providers::*;

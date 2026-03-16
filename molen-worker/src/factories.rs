@@ -3,7 +3,7 @@
 //! These factories provide a centralized way to instantiate providers
 //! with different configurations and implementations.
 
-use molen_core::{InferenceProvider, StorageProvider};
+use molen_core::{InferenceProvider, RealStorageProvider, StorageProvider};
 use std::sync::Arc;
 
 /// Configuration for the WorkerFactory
@@ -84,7 +84,7 @@ pub struct StorageConfig {
 /// Factory for creating StorageProvider instances
 ///
 /// This factory creates storage providers that interact with S3-compatible
-/// object storage (including Garage).
+/// object storage (including Garage/MinIO).
 pub struct StorageFactory;
 
 impl StorageFactory {
@@ -98,8 +98,8 @@ impl StorageFactory {
     ///
     /// # Examples
     /// ```no_run
-    /// use molen_worker::{StorageFactory, StorageConfig};
-    ///
+    /// # use molen_worker::{StorageFactory, StorageConfig};
+    /// # async fn example() {
     /// let config = StorageConfig {
     ///     endpoint: "https://s3.amazonaws.com".to_string(),
     ///     access_key: "ACCESS_KEY".to_string(),
@@ -108,10 +108,21 @@ impl StorageFactory {
     ///     region: Some("us-east-1".to_string()),
     /// };
     ///
-    /// let provider = StorageFactory::create_storage_provider(config);
+    /// let provider = StorageFactory::create_storage_provider(config).await.unwrap();
+    /// # }
     /// ```
-    pub fn create_storage_provider(_config: StorageConfig) -> Arc<dyn StorageProvider> {
-        todo!("Implement StorageProvider factory for S3/Garage")
+    pub async fn create_storage_provider(config: StorageConfig) -> anyhow::Result<Arc<dyn StorageProvider>> {
+        // Create RealStorageProvider using the config
+        let storage_config = molen_core::providers::storage::StorageConfig {
+            endpoint: config.endpoint,
+            access_key: config.access_key,
+            secret_key: config.secret_key,
+            bucket: config.bucket,
+            region: config.region,
+        };
+        
+        let provider = RealStorageProvider::new(storage_config).await?;
+        Ok(Arc::new(provider))
     }
 
     /// Create a mock StorageProvider for testing
@@ -136,8 +147,9 @@ impl StorageFactory {
     ///
     /// # Errors
     /// Returns an error if required environment variables are missing
-    pub fn from_env() -> anyhow::Result<Arc<dyn StorageProvider>> {
-        todo!("Implement StorageProvider creation from environment variables")
+    pub async fn from_env() -> anyhow::Result<Arc<dyn StorageProvider>> {
+        let provider = RealStorageProvider::from_env().await?;
+        Ok(Arc::new(provider))
     }
 }
 
@@ -200,22 +212,20 @@ mod tests {
         assert!(result.fraud_score >= 0.0 && result.fraud_score <= 1.0);
     }
 
-    #[test]
-    #[should_panic(expected = "not yet implemented")]
-    fn test_storage_factory_should_create_provider() {
+    #[tokio::test]
+    async fn test_storage_factory_should_create_provider() {
         let config = StorageConfig {
-            endpoint: "https://s3.amazonaws.com".to_string(),
-            access_key: "test_key".to_string(),
-            secret_key: "test_secret".to_string(),
+            endpoint: "http://localhost:9000".to_string(),
+            access_key: "minioadmin".to_string(),
+            secret_key: "minioadmin".to_string(),
             bucket: "test-bucket".to_string(),
             region: Some("us-east-1".to_string()),
         };
 
-        let provider = StorageFactory::create_storage_provider(config);
+        let result = StorageFactory::create_storage_provider(config).await;
         
-        // This should fail because the implementation uses todo!()
-        // We can't call async methods in sync test, so just verify it was created
-        assert!(!Arc::ptr_eq(&provider, &provider));
+        // Real implementation - should create successfully
+        assert!(result.is_ok(), "Should create real storage provider");
     }
 
     #[test]
@@ -227,30 +237,6 @@ mod tests {
         assert!(!Arc::ptr_eq(&provider, &provider));
     }
 
-    #[tokio::test]
-    #[should_panic(expected = "not yet implemented")]
-    async fn test_storage_factory_provider_should_load_model() {
-        let config = StorageConfig {
-            endpoint: "https://test.s3.com".to_string(),
-            access_key: "test".to_string(),
-            secret_key: "test".to_string(),
-            bucket: "models".to_string(),
-            region: None,
-        };
-
-        let provider = StorageFactory::create_storage_provider(config);
-        
-        let model_data = provider.load_model("models/test.bin").await.unwrap();
-        
-        // This should fail because the implementation uses todo!()
-        assert!(!model_data.is_empty());
-    }
-
-    #[test]
-    #[should_panic(expected = "not yet implemented")]
-    fn test_storage_factory_from_env_should_fail_without_vars() {
-        // This should fail because environment variables are not set
-        // and the implementation uses todo!()
-        let _provider = StorageFactory::from_env().unwrap();
-    }
+    // Note: Integration tests with real MinIO/S3 would be in tests/ directory
+    // using testcontainers
 }
