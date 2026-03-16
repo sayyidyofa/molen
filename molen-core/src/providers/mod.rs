@@ -5,6 +5,8 @@
 
 pub mod storage;
 pub mod state;
+pub mod events;
 
 pub use storage::RealStorageProvider;
 pub use state::RealStateProvider;
+pub use events::RealEventStreamProvider;
