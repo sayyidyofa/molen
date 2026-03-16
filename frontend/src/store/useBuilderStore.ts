@@ -10,7 +10,7 @@ import type {
   TestResult,
   Transaction,
 } from '../types/molen';
-import { evaluateNode, generateMockTransaction } from '../services/mockBackend';
+import api from '../services/api';
 
 interface BuilderState {
   // Graph state
@@ -119,26 +119,49 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
 
       // Generate or reuse transaction
       const transaction =
-        state.currentTransaction || generateMockTransaction();
+        state.currentTransaction || api.generateMockTransaction();
       
       if (!state.currentTransaction) {
         set({ currentTransaction: transaction });
       }
 
-      // Execute node test
-      const result = await evaluateNode(nodeId, node.data, transaction);
+      // Call real API to test transaction
+      const response = await api.testTransaction('default-graph', transaction);
+
+      // Create test result from API response
+      const testResult: TestResult = {
+        nodeId,
+        success: true,
+        result: response.result,
+        executedAt: Date.now(),
+      };
 
       // Update results
       const newResults = new Map(state.testResults);
-      newResults.set(nodeId, result);
+      newResults.set(nodeId, testResult);
 
       set({
-        executionState: result.success ? 'success' : 'error',
+        executionState: 'success',
         testResults: newResults,
       });
     } catch (error) {
       console.error('Test execution failed:', error);
-      set({ executionState: 'error' });
+      
+      // Create error test result
+      const errorResult: TestResult = {
+        nodeId,
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        executedAt: Date.now(),
+      };
+
+      const newResults = new Map(state.testResults);
+      newResults.set(nodeId, errorResult);
+
+      set({ 
+        executionState: 'error',
+        testResults: newResults,
+      });
     }
   },
 
