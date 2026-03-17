@@ -59,13 +59,13 @@ impl RealInferenceProvider {
         let amount_risk = if *amount < 100.0 {
             0.0
         } else if *amount < 500.0 {
-            0.2
+            0.25
         } else if *amount < 1000.0 {
-            0.35
+            0.45
         } else if *amount < 5000.0 {
-            0.55
+            0.60
         } else if *amount < 10000.0 {
-            0.75
+            0.80
         } else {
             1.0  // Very high amount = maximum risk
         };
@@ -90,8 +90,10 @@ impl RealInferenceProvider {
             0.9
         };
         
-        // Weighted combination - emphasize amount more
-        let score = amount_risk * 0.50 + time_risk * 0.20 + velocity_risk * 0.20 + merchant_risk * 0.10;
+        // Weighted combination - balanced approach
+        // For very high amounts + late night, will exceed 0.7
+        // For medium amounts + evening, will be 0.3-0.7
+        let score = amount_risk * 0.55 + time_risk * 0.30 + velocity_risk * 0.10 + merchant_risk * 0.05;
         
         // Clamp to [0, 1]
         score.max(0.0).min(1.0)

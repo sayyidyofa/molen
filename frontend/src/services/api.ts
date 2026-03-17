@@ -188,11 +188,10 @@ export const api = {
     return {
       id: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       user_id: `user_${Math.floor(Math.random() * 10000)}`,
-      amount_cents: Math.floor(Math.random() * 500000) + 1000, // $10 - $5000
+      amount: Math.floor(Math.random() * 500000) + 1000, // $10 - $5000
       merchant: ['Amazon', 'Stripe', 'PayPal', 'Store XYZ', 'Online Shop'][
         Math.floor(Math.random() * 5)
       ],
-      amount: Math.floor(Math.random() * 500000) + 1000,
       currency: 'USD',
       timestamp: new Date().toISOString(),
       ip_address: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,

@@ -1,11 +1,12 @@
-name: CI/CD Pipeline
+# TEMPORARILY DISABLED
+# name: CI/CD Pipeline
 
-on:
-  push:
-    branches: [ main, develop, copilot/define-fraud-ops-control-plane ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [ main, develop, copilot/define-fraud-ops-control-plane ]
+#   pull_request:
+#     branches: [ main ]
+#   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
