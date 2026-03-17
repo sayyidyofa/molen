@@ -6,7 +6,7 @@ expect.extend(matchers);
 
 // Mock ResizeObserver for React Flow
 beforeAll(() => {
-  global.ResizeObserver = class ResizeObserver {
+  globalThis.ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
     disconnect() {}

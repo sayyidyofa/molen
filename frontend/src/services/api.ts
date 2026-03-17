@@ -3,7 +3,7 @@
  * Connects to Rust Axum API
  */
 
-import type { Transaction, InferenceResult, Decision } from '../types/molen';
+import type { Transaction, InferenceResult } from '../types/molen';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -54,13 +54,14 @@ export interface HealthResponse {
  * API error class
  */
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public details?: unknown
-  ) {
+  status: number;
+  details?: unknown;
+  
+  constructor(message: string, status: number, details?: unknown) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
   }
 }
 
@@ -185,16 +186,15 @@ export const api = {
    */
   generateMockTransaction(): Transaction {
     return {
-      transaction_id: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       user_id: `user_${Math.floor(Math.random() * 10000)}`,
       amount_cents: Math.floor(Math.random() * 500000) + 1000, // $10 - $5000
       merchant: ['Amazon', 'Stripe', 'PayPal', 'Store XYZ', 'Online Shop'][
         Math.floor(Math.random() * 5)
       ],
-      merchant_category: ['retail', 'online', 'services', 'entertainment'][
-        Math.floor(Math.random() * 4)
-      ],
-      timestamp_ms: Date.now(),
+      amount: Math.floor(Math.random() * 500000) + 1000,
+      currency: 'USD',
+      timestamp: new Date().toISOString(),
       ip_address: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
       device_id: `device_${Math.random().toString(36).substr(2, 12)}`,
       country: ['US', 'UK', 'CA', 'AU'][Math.floor(Math.random() * 4)],

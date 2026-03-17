@@ -55,22 +55,26 @@ impl RealInferenceProvider {
         let velocity = features.get("velocity_count").unwrap_or(&0.0);
         let merchant_risk = features.get("merchant_risk").unwrap_or(&0.0);
         
-        // Amount risk scoring
+        // Amount risk scoring (more aggressive)
         let amount_risk = if *amount < 100.0 {
             0.0
+        } else if *amount < 500.0 {
+            0.2
         } else if *amount < 1000.0 {
-            0.3
+            0.35
+        } else if *amount < 5000.0 {
+            0.55
         } else if *amount < 10000.0 {
-            0.6
+            0.75
         } else {
-            0.9
+            1.0  // Very high amount = maximum risk
         };
         
         // Time of day risk (late night = higher risk)
         let time_risk = if *hour >= 23.0 || *hour < 6.0 {
-            0.4
+            0.5  // Late night/early morning
         } else if *hour >= 21.0 || *hour < 8.0 {
-            0.2
+            0.3  // Evening/early morning
         } else {
             0.0
         };
@@ -86,8 +90,8 @@ impl RealInferenceProvider {
             0.9
         };
         
-        // Weighted combination
-        let score = amount_risk * 0.35 + time_risk * 0.15 + velocity_risk * 0.30 + merchant_risk * 0.20;
+        // Weighted combination - emphasize amount more
+        let score = amount_risk * 0.50 + time_risk * 0.20 + velocity_risk * 0.20 + merchant_risk * 0.10;
         
         // Clamp to [0, 1]
         score.max(0.0).min(1.0)

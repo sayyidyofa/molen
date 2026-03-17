@@ -133,7 +133,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         nodeId,
         success: true,
         result: response.result,
-        executedAt: Date.now(),
+        timestamp: new Date().toISOString(),
       };
 
       // Update results
@@ -152,7 +152,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         nodeId,
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        executedAt: Date.now(),
+        timestamp: new Date().toISOString(),
       };
 
       const newResults = new Map(state.testResults);
