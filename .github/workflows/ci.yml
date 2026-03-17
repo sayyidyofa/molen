@@ -2,9 +2,10 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, copilot/define-fraud-ops-control-plane ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -32,7 +33,7 @@ jobs:
 
   build-push:
     needs: [test-backend, test-frontend]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/copilot/define-fraud-ops-control-plane')
     runs-on: ubuntu-latest
     permissions:
       packages: write
