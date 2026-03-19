@@ -1,0 +1,121 @@
+name: Create Fraud-Ops Platform Issues
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - copilot/create-issues-for-fraud-ops-platform
+    paths:
+      - '.github/workflows/create-fraud-ops-issues.yml'
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Create labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          create_label() {
+            local name="$1" color="$2" desc="$3"
+            gh label create "$name" --color "$color" --description "$desc" --repo "$REPO" 2>/dev/null \
+              || echo "Label '$name' already exists, skipping."
+          }
+          create_label "backend"        "e4e669" "Backend / Rust server-side work"
+          create_label "frontend"       "0075ca" "Frontend / React + TypeScript work"
+          create_label "infrastructure" "d93f0b" "DevOps, Docker, Kubernetes, CI/CD"
+          create_label "database"       "0e8a16" "Database schemas, migrations, queries"
+          create_label "ui"             "bfd4f2" "UI components, layout, and design"
+
+      - name: Create Epic 1 issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "Foundation & Infrastructure" \
+            --label "backend,infrastructure,database" \
+            --body '> Get the local dev environment, monorepo, and infrastructure running.
+
+- [ ] Task 1.1: Scaffold Rust Cargo Workspace (molen-core, molen-worker, molen-api).
+- [ ] Task 1.2: Scaffold Vite + React + TS frontend (ui).
+- [ ] Task 1.3: Create docker-compose.yml containing Redpanda, Redis, PostgreSQL, and Elasticsearch.
+- [ ] Task 1.4: Write database migration scripts (sqlx) for core tables.'
+
+      - name: Create Epic 2 issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "The Type Contract" \
+            --label "backend,frontend" \
+            --body '> Define the strict data models in Rust and auto-generate the TypeScript bindings.
+
+- [ ] Task 2.1: Define core Rust structs in molen-core (Transaction, Decision, InferenceResult).
+- [ ] Task 2.2: Define entity structs (InputSchema, FeatureExtractor, Rule, ModelMetadata, GraphConfig).
+- [ ] Task 2.3: Set up ts-rs or specta to auto-generate ui/src/types/molen.ts.'
+
+      - name: Create Epic 3 issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "Frontend Shell & Global State" \
+            --label "frontend,ui" \
+            --body '> Build the multi-page SaaS layout and the global state container.
+
+- [ ] Task 3.1: Set up Tailwind, Shadcn UI, and React Router DOM.
+- [ ] Task 3.2: Build the DashboardLayout with a persistent left-hand Sidebar.
+- [ ] Task 3.3: Implement useMolenStore.ts (Zustand) and seed with dummy data.'
+
+      - name: Create Epic 4 issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "Schemas & Ingestion" \
+            --label "frontend,ui,backend" \
+            --body '> Allow users to define data shapes and how to extract features from them.
+
+- [ ] Task 4.1: Build /schemas Page (Data Table and Create Dialog).
+- [ ] Task 4.2: Build /extractors Page (Data Table).
+- [ ] Task 4.3: Build Extractor Form Modal (Select Schema, Tabs for JQ vs UI-Guided).'
+
+      - name: Create Epic 5 issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "Logic Gates & Models" \
+            --label "frontend,ui,backend" \
+            --body '> Create the isolated rules and models that will make up the pipeline.
+
+- [ ] Task 5.1: Build /rules Page (Form for field, operator, threshold, action).
+- [ ] Task 5.2: Build /models Page (Data Table).
+- [ ] Task 5.3: Build Model Training Form (Tabs for UI-Guided vs Notebook).'
+
+      - name: Create Epic 6 issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue create \
+            --repo "$REPO" \
+            --title "The Type-Safe Orchestrator" \
+            --label "frontend,ui,backend" \
+            --body '> The visual canvas where users wire the components together.
+
+- [ ] Task 6.1: Set up React Flow canvas in a dedicated /pipelines page.'
