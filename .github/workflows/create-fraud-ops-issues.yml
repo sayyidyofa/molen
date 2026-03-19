@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - copilot/create-issues-for-fraud-ops-platform
     paths:
       - '.github/workflows/create-fraud-ops-issues.yml'
