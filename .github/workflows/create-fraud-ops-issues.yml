@@ -8,11 +8,12 @@ on:
     paths:
       - '.github/workflows/create-fraud-ops-issues.yml'
 
+permissions:
+  issues: write
+
 jobs:
   create-issues:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
 
     steps:
       - name: Create labels
