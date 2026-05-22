@@ -1,0 +1,25 @@
+{
+  "name": "molen",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "dev:api": "bun apps/api/src/index.ts",
+    "dev:web": "cd apps/web && bun run dev",
+    "dev:engine": "cd apps/engine && cargo run",
+    "db:init": "bun apps/api/src/db-init.ts",
+    "db:seed": "bun apps/api/src/seed.ts",
+    "install:all": "bun install",
+    "test:api": "export NODE_ENV=test && ( [ -f .env ] && export $(grep -v '^#' .env | xargs) || true ) && bun test apps/api/src/e2e.test.ts",
+    "test:web": "cd apps/web && npx playwright test",
+    "test:web:install": "cd apps/web && npx playwright install --with-deps chromium",
+    "test:e2e": "npm run test:api && npm run test:web"
+  },
+  "devDependencies": {
+    "bun": "^1.3.14"
+  }
+}

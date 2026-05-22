@@ -1,0 +1,11 @@
+{
+  "name": "molen-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for Project Molen",
+  "devDependencies": {
+    "@playwright/test": "latest"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4"
+  }
+}

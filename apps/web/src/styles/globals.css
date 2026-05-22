@@ -1,0 +1,52 @@
+/* ReactFlow custom styles for Molen */
+.react-flow__edge-path {
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.5));
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  animation: dashdraw 1s linear infinite;
+  stroke-dasharray: 5;
+}
+
+@keyframes dashdraw {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+.react-flow__node {
+  transition: transform 0.2s ease;
+}
+
+.react-flow__node:hover {
+  transform: scale(1.02);
+}
+
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+/* Enhanced card glow effects */
+.card-glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

@@ -1,0 +1,162 @@
+import { test, expect } from '@playwright/test';
+import { Kafka, logLevel } from 'kafkajs';
+
+test.describe('Fraud Analyst E2E Workflow', () => {
+  let kafka: Kafka;
+  const brokers = ['localhost:19092'];
+  const inboundTopic = 'molen_transactions_in';
+  const outboundTopic = 'molen_scores_out';
+
+  test.beforeAll(async () => {
+    kafka = new Kafka({
+      clientId: 'e2e-test-runner',
+      brokers,
+      logLevel: logLevel.ERROR,
+    });
+
+    const admin = kafka.admin();
+    await admin.connect();
+    await admin.createTopics({
+      topics: [
+        { topic: inboundTopic, numPartitions: 1 },
+        { topic: outboundTopic, numPartitions: 1 },
+        { topic: 'molen_control_dev', numPartitions: 1 },
+      ],
+    });
+    await admin.disconnect();
+  });
+
+  test('should complete the full fraud analysis lifecycle', async ({ page }) => {
+    test.setTimeout(120000); // 2 minutes for full flow
+    const timestamp = Date.now();
+    const schemaName = `Schema-${timestamp}`;
+    const extractorName = `Extractor-${timestamp}`;
+    const ruleName = `Rule-${timestamp}`;
+    const orchestratorName = `Orchestrator-${timestamp}`;
+    const transactionId = `tx-${timestamp}`;
+
+    // 1. Authoring: Create InputSchema
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Input Schemas' }).click();
+    await page.getByRole('button', { name: 'New Schema' }).click();
+    await page.fill('#name', schemaName);
+    await page.fill('#version', 'v1.0');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await expect(page.getByText(`Created ${schemaName}`)).toBeVisible();
+
+    // 2. Authoring: Create FeatureExtractor
+    await page.getByRole('link', { name: 'Feature Extractors' }).click();
+    await page.getByRole('button', { name: 'New Extractor' }).click();
+    await page.fill('#name', extractorName);
+    await page.fill('#sourceField', 'amount');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await expect(page.getByText(`Created ${extractorName}`)).toBeVisible();
+
+    // 3. Authoring: Create Rule
+    await page.getByRole('link', { name: 'Rules' }).click();
+    await page.getByRole('button', { name: 'New Rule' }).click();
+    await page.fill('#name', ruleName);
+    await page.fill('#condition', 'amount > 1000');
+    await page.fill('#anomalyScore', '80');
+    await page.getByRole('button', { name: 'Create' }).click();
+    await expect(page.getByText(`Created ${ruleName}`)).toBeVisible();
+
+    // 4. Orchestrating: Create Orchestrator
+    await page.getByRole('link', { name: 'Orchestrator' }).click();
+    await page.getByRole('button', { name: 'New Orchestrator' }).first().click();
+    await page.fill('input[placeholder="e.g. High-Value Transaction Check"]', orchestratorName);
+    await page.getByRole('button', { name: 'Create & Open Editor' }).click();
+    
+    // 5. Build Graph: Add Score Sink and some other nodes via drag and drop
+    await expect(page.getByText('Palette', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Add Score Sink' }).click();
+    
+    // Drag a Rule node from palette to canvas
+    // We filter by text and make sure it's in the palette area
+    const ruleItem = page.locator('.bg-sidebar\\/60').getByText(ruleName).first();
+    const canvas = page.locator('.react-flow__pane');
+    await ruleItem.dragTo(canvas, { targetPosition: { x: 300, y: 300 } });
+
+    await page.getByRole('button', { name: 'Save Draft' }).click();
+    await expect(page.getByText('Orchestrator saved')).toBeVisible();
+    
+    // 6. Deployment: Commit Version and Promote
+    await page.getByRole('button', { name: 'Commit Version' }).click();
+    await expect(page.getByText('Version committed')).toBeVisible();
+    
+    await page.getByRole('tab', { name: 'Deployments' }).click();
+    
+    // Wait for the version to appear in the list and click its menu
+    const versionRow = page.locator('tr').filter({ hasText: 'v1' }).first();
+    await expect(versionRow).toBeVisible();
+    await versionRow.getByRole('button').click();
+    await page.getByRole('menuitem', { name: 'Deploy to Production' }).click();
+    
+    await page.getByRole('button', { name: 'Confirm & Deploy' }).click();
+    // Toast might appear asynchronously; continue after brief stabilization
+    await page.waitForTimeout(500);
+
+    // Additionally ensure the engine receives the latest committed graph
+    const url = new URL(page.url());
+    const draftId = url.pathname.split('/')[2];
+    const versionsRes = await fetch(`http://localhost:3001/orchestrators/versions/${draftId}`);
+    const versions = await versionsRes.json();
+    const latest = versions[0];
+    const controlProducer = kafka.producer();
+    await controlProducer.connect();
+    await controlProducer.send({
+      topic: 'molen_control_dev',
+      messages: [{ value: JSON.stringify(latest.graph) }],
+    });
+    await controlProducer.disconnect();
+
+    // 7. Data Plane Execution: Prepare Consumer
+    const consumer = kafka.consumer({ groupId: `e2e-verifier-${timestamp}` });
+    await consumer.connect();
+    await consumer.subscribe({ topic: outboundTopic, fromBeginning: false });
+
+    let scoreReceived = false;
+    let receivedPayload: any = null;
+
+    await consumer.run({
+      eachMessage: async ({ message }) => {
+        const payload = JSON.parse(message.value?.toString() || '{}');
+        console.log('Received score payload:', payload);
+        if (payload.transaction_id === transactionId) {
+          scoreReceived = true;
+          receivedPayload = payload;
+        }
+      },
+    });
+
+    // 8. Data Plane Execution: Inject Transaction
+    const producer = kafka.producer();
+    await producer.connect();
+    const transaction = {
+      id: transactionId,
+      amount: 5000,
+      currency: 'USD',
+    };
+
+    console.log('Injecting transaction:', transaction);
+    await producer.send({
+      topic: inboundTopic,
+      messages: [{ value: JSON.stringify(transaction) }],
+    });
+    await producer.disconnect();
+
+    // 9. Verification: Wait for Score
+    console.log('Waiting for score output...');
+    const start = Date.now();
+    while (Date.now() - start < 30000 && !scoreReceived) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    await consumer.stop();
+    await consumer.disconnect();
+    
+    expect(scoreReceived, 'Should have received a score for the transaction').toBe(true);
+    expect(receivedPayload.score).toBe(20); // 1 Sink + 1 Rule = 2 nodes * 10
+    expect(receivedPayload.node_count).toBe(2);
+  });
+});
