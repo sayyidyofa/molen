@@ -60,16 +60,26 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("size-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("size-4", className)} {...props} />
-        ),
+        IconLeft: CalendarIconLeft,
+        IconRight: CalendarIconRight,
       }}
       {...props}
     />
   );
+}
+
+function CalendarIconLeft({
+  className,
+  ...props
+}: React.ComponentProps<typeof ChevronLeft>) {
+  return <ChevronLeft className={cn("size-4", className)} {...props} />;
+}
+
+function CalendarIconRight({
+  className,
+  ...props
+}: React.ComponentProps<typeof ChevronRight>) {
+  return <ChevronRight className={cn("size-4", className)} {...props} />;
 }
 
 export { Calendar };

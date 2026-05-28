@@ -71,8 +71,10 @@ export enum NodeType {
 
 export interface Node {
   id: string;
-  type: NodeType;
-  config: InputSchema | FeatureExtractor | Rule | MLModel | Record<string, unknown>;
+  type: NodeType | string;
+  position: { x: number; y: number };
+  data: Record<string, unknown>;
+  config?: InputSchema | FeatureExtractor | Rule | MLModel | Record<string, unknown>;
   cardinality?: 'ONE_TO_ONE' | 'ONE_TO_MANY' | 'MANY_TO_ONE';
   aggregator?: 'SUM' | 'AVG' | 'MAX' | 'MIN';
 }

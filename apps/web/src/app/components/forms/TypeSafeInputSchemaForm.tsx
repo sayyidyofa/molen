@@ -73,7 +73,7 @@ export function TypeSafeInputSchemaForm({
           <Label htmlFor="status">Status</Label>
           <Select
             value={formData.status}
-            onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+            onValueChange={(value) => setFormData({ ...formData, status: value as "active" | "draft" | "deprecated" })}
           >
             <SelectTrigger className="bg-input border-border/50">
               <SelectValue />

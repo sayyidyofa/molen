@@ -36,7 +36,7 @@ export function RuleTypeDialog({ trigger, initialData, onSubmit }: RuleTypeDialo
     name: initialData?.name || "",
     baseType: initialData?.baseType || DataType.STRING,
     description: initialData?.description || "",
-    schema: initialData?.schema || ([] as SchemaProperty[]),
+    schema: initialData?.schema?.map(s => ({ ...s, id: s.id || crypto.randomUUID() })) || ([] as SchemaProperty[]),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -52,7 +52,7 @@ export function RuleTypeDialog({ trigger, initialData, onSubmit }: RuleTypeDialo
   const addSchemaProperty = () => {
     setFormData({
       ...formData,
-      schema: [...formData.schema, { key: "", type: DataType.STRING }],
+      schema: [...(formData.schema || []), { id: crypto.randomUUID(), key: "", type: DataType.STRING }],
     });
   };
 
@@ -152,8 +152,8 @@ export function RuleTypeDialog({ trigger, initialData, onSubmit }: RuleTypeDialo
               </div>
 
               <div className="space-y-2 max-h-64 overflow-auto">
-                {formData.schema.map((prop, index) => (
-                  <Card key={index} className="p-3 border-border/50 bg-card/30">
+                {formData.schema?.map((prop, index) => (
+                  <Card key={prop.id} className="p-3 border-border/50 bg-card/30">
                     <div className="grid grid-cols-[1fr,1fr,auto] gap-3 items-center">
                       <Input
                         placeholder="Property name"

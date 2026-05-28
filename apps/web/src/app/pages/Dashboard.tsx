@@ -3,6 +3,19 @@ import { Badge } from "../components/ui/badge";
 import { Activity, TrendingUp, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { useCombinedAppState } from "../hooks/useMolenApi";
 
+interface Workflow {
+  id?: string;
+  name: string;
+  avgLatency?: string;
+  status: string;
+}
+
+interface SystemService {
+  service: string;
+  uptime: string;
+  status: string;
+}
+
 export function Dashboard() {
   const state = useCombinedAppState();
 
@@ -86,9 +99,9 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {state.orchestrators.map((workflow: any, i: number) => (
+              {(state.orchestrators as Workflow[]).map((workflow) => (
                 <div
-                  key={i}
+                  key={workflow.id || workflow.name}
                   className="flex items-center justify-between border-b border-border/30 pb-3 last:border-0 last:pb-0"
                 >
                   <div className="space-y-1">
@@ -122,9 +135,9 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {state.systemHealth.map((service: any, i: number) => (
+              {(state.systemHealth as SystemService[]).map((service) => (
                 <div
-                  key={i}
+                  key={service.service}
                   className="flex items-center justify-between border-b border-border/30 pb-3 last:border-0 last:pb-0"
                 >
                   <div className="space-y-1">

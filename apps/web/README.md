@@ -124,8 +124,11 @@ Separate authoring from deployment with a dedicated **Release Manager**:
 - **TypeScript 5.0+** - Type safety
 
 ### State Management
-- **Custom Reactive State** - Lightweight observable pattern
+- **TanStack React Query v5** - Primary state management for server data
 - **React Hooks** - Local component state
+- **Custom Logic Helpers** - Pure business logic in `src/app/state/`
+
+For a detailed guide on contributing to the web codebase, see our [Web Developer Guide](./DEVELOPER_GUIDE.md).
 
 ### Data Visualization
 - **Recharts 2.15** - Charts and sparklines

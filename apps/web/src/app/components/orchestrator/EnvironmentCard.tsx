@@ -81,7 +81,8 @@ export function EnvironmentCard({
         <div className="h-8 flex items-end gap-0.5 opacity-60">
           {Array.from({ length: 20 }).map((_, i) => (
             <div
-              key={i}
+              // eslint-disable-next-line @eslint-react/no-array-index-key
+              key={`sparkline-${i}`}
               className="flex-1 bg-gradient-to-t from-primary/60 to-primary/20 rounded-sm"
               style={{
                 height: `${Math.random() * 60 + 40}%`,

@@ -223,10 +223,12 @@ export const app = new Elysia()
     body: t.Object({
       id: t.Optional(t.String()),
       name: t.String(),
+      description: t.Optional(t.String()),
       graph: t.Object({
         nodes: t.Array(t.Unknown()),
         edges: t.Array(t.Unknown())
       }),
+      status: t.Optional(t.String()),
       updatedAt: t.Optional(t.Any())
     })
   })

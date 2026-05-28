@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------
+  # 1. Relational Database
+  # ----------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: molen_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - molen_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------
+  # 2. Event Streaming (Redpanda)
+  # ----------------------------------------
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.18
+    container_name: molen_redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --smp 1
+      - --memory 1G
+      - --mode dev-container
+      - --default-log-level=info
+    ports:
+      - "18081:8081"
+      - "18082:8082"
+      - "19092:19092"
+      - "19644:9644"
+    volumes:
+      - molen_redpanda_data:/var/lib/redpanda/data
+
+  # ----------------------------------------
+  # 3. Redpanda Console (UI for debugging)
+  # ----------------------------------------
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.4.6
+    container_name: molen_redpanda_console
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      KAFKA_SCHEMAREGISTRY_URL: http://redpanda:8081
+    depends_on:
+      - redpanda
+
+  # ----------------------------------------
+  # 4. Object Storage (MinIO for local S3)
+  # ----------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: molen_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Web UI
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    volumes:
+      - molen_s3_data:/data
+volumes:
+  molen_pg_data:
+  molen_redpanda_data:
+  molen_s3_data:

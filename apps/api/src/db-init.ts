@@ -61,18 +61,20 @@ async function initDb() {
   await sql`ALTER TABLE models ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'training'`;
 
   await sql`
-    CREATE TABLE IF NOT EXISTS drafts (
+    CREATE TABLE IF NOT EXISTS orchestrator_drafts (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name TEXT NOT NULL,
+      description TEXT,
       graph JSONB NOT NULL,
+      status TEXT DEFAULT 'draft',
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
   `;
 
   await sql`
-    CREATE TABLE IF NOT EXISTS committed_versions (
+    CREATE TABLE IF NOT EXISTS orchestrator_versions (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      draft_id UUID REFERENCES drafts(id),
+      draft_id UUID REFERENCES orchestrator_drafts(id),
       version INTEGER NOT NULL,
       graph JSONB NOT NULL,
       committed_at TIMESTAMPTZ DEFAULT NOW()
@@ -83,7 +85,7 @@ async function initDb() {
     CREATE TABLE IF NOT EXISTS deployments (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name TEXT NOT NULL,
-      active_version_id UUID REFERENCES committed_versions(id),
+      active_version_id UUID REFERENCES orchestrator_versions(id),
       deployed_at TIMESTAMPTZ DEFAULT NOW()
     );
   `;

@@ -1,5 +1,5 @@
 # Build stage
-FROM oven/bun:1.1.8 AS builder
+FROM oven/bun:1.3.4 AS builder
 WORKDIR /app
 
 # Only copy what's needed for install
@@ -14,7 +14,7 @@ COPY . .
 RUN bun install
 
 # Runtime stage
-FROM oven/bun:1.1.8-slim
+FROM oven/bun:1.3.4-slim
 WORKDIR /app
 
 COPY --from=builder /app ./

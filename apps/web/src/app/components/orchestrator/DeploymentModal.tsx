@@ -55,7 +55,7 @@ export function DeploymentModal({
         setIsDeploying(false);
         onOpenChange(false);
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         toast.error("Deployment failed", {
           description: error.message,
         });

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Textarea } from "../ui/textarea";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
@@ -19,15 +19,17 @@ interface CodeLogicEditorProps {
 
 export function CodeLogicEditor({ ruleType, value, onChange }: CodeLogicEditorProps) {
   const [showIntellisense, setShowIntellisense] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const variables = getVariablesForRuleType(ruleType);
   const validation = validateRuleExpression(value);
 
-  useEffect(() => {
-    // Check if user typed {{
-    const textBeforeCursor = value.substring(0, cursorPosition);
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    const cursorPos = e.target.selectionStart;
+    onChange(newValue);
+
+    const textBeforeCursor = newValue.substring(0, cursorPos);
     const lastTwoChars = textBeforeCursor.slice(-2);
 
     if (lastTwoChars === "{{") {
@@ -35,13 +37,19 @@ export function CodeLogicEditor({ ruleType, value, onChange }: CodeLogicEditorPr
     } else if (!textBeforeCursor.includes("{{") || textBeforeCursor.includes("}}")) {
       setShowIntellisense(false);
     }
-  }, [value, cursorPosition]);
+  };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    const cursorPos = e.target.selectionStart;
-    setCursorPosition(cursorPos);
-    onChange(newValue);
+  const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const cursorPos = e.currentTarget.selectionStart;
+
+    const textBeforeCursor = value.substring(0, cursorPos);
+    const lastTwoChars = textBeforeCursor.slice(-2);
+
+    if (lastTwoChars === "{{") {
+      setShowIntellisense(true);
+    } else if (!textBeforeCursor.includes("{{") || textBeforeCursor.includes("}}")) {
+      setShowIntellisense(false);
+    }
   };
 
   const insertSuggestion = (suggestion: string) => {
@@ -94,6 +102,7 @@ export function CodeLogicEditor({ ruleType, value, onChange }: CodeLogicEditorPr
           ref={textareaRef}
           value={value}
           onChange={handleTextChange}
+          onSelect={handleSelect}
           placeholder='Type {{ to see available variables, e.g., {{input.amount}} > 5000 and {{input.email}} contains("@trusted.com")'
           className="border-border/50 min-h-32 font-mono text-sm leading-relaxed resize-none"
           style={{
@@ -141,8 +150,8 @@ export function CodeLogicEditor({ ruleType, value, onChange }: CodeLogicEditorPr
       {!validation.valid && validation.errors && (
         <Card className="p-3 bg-destructive/10 border-destructive/30">
           <div className="space-y-1">
-            {validation.errors.map((error, i) => (
-              <div key={i} className="flex items-start gap-2">
+            {validation.errors.map((error) => (
+              <div key={error} className="flex items-start gap-2">
                 <X className="h-3 w-3 text-destructive mt-0.5 flex-shrink-0" />
                 <span className="text-xs text-destructive">{error}</span>
               </div>

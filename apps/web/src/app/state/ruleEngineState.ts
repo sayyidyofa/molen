@@ -45,7 +45,7 @@ export const visualBlocksToCode = (blocks: LogicBlock[]): string => {
   return blocks
     .map((block, index) => {
       const operator = TypeOperators[block.variableType]?.find((op) => op.value === block.operator);
-      let expression = "";
+      let expression: string;
 
       // Handle different operator types
       if (operator?.syntax) {
@@ -118,7 +118,7 @@ export const codeToVisualBlocks = (expression: string, ruleType: RuleTypeView): 
 
     // Try to match operator and value
     let operator = "";
-    let value: any = "";
+    let value: unknown = "";
 
     // Check for function-based operators (e.g., contains("value"))
     const funcMatch = part.match(/\}\}\s+(\w+)\((.*?)\)/);

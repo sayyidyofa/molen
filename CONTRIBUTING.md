@@ -15,6 +15,9 @@ Maintain a professional and inclusive environment. Focus on technical excellence
 
 ## 💻 Coding Standards
 
+### General Rules
+- **Maximum 250 LOC per source file**: To maintain readability and maintainability, every source code file (`.ts`, `.tsx`, `.rs`) must not exceed 250 lines of code (excluding blank lines and comments). If a file grows larger, it should be refactored into smaller components, hooks, or modules.
+
 ### TypeScript (Frontend & API)
 - Use **Strict Mode** in `tsconfig.json`.
 - Prefer `interface` over `type` for public-facing contracts.

@@ -5,7 +5,7 @@ mod evaluator;
 mod events;
 
 use evaluator::evaluate_graph;
-use events::{EventConsumer, EventProducer, KafkaConsumer, KafkaProducer};
+use events::{create_topics, EventConsumer, EventProducer, KafkaConsumer, KafkaProducer};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -57,6 +57,15 @@ async fn main() {
         .unwrap_or_else(|_| "molen_transactions_in".to_string());
     let outbound_topic =
         std::env::var("MOLEN_OUTBOUND_TOPIC").unwrap_or_else(|_| "molen_scores_out".to_string());
+
+    if std::env::var("SEED_KAFKA").unwrap_or_else(|_| "false".to_string()) == "true" {
+        println!("Seeding Kafka topics...");
+        if let Err(e) =
+            create_topics(&brokers, &[&control_topic, &inbound_topic, &outbound_topic]).await
+        {
+            eprintln!("Failed to seed Kafka topics: {e}");
+        }
+    }
 
     println!("Starting Molen Engine with brokers: {brokers}");
 

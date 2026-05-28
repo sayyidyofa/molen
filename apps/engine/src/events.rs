@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use rdkafka::admin::{AdminClient, AdminOptions, NewTopic, TopicReplication};
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::Message;
@@ -13,6 +14,42 @@ pub trait EventConsumer: Send + Sync {
 #[async_trait]
 pub trait EventProducer: Send + Sync {
     async fn send(&self, topic: &str, key: &str, payload: &str) -> Result<(), String>;
+}
+
+pub async fn create_topics(brokers: &str, topics: &[&str]) -> Result<(), String> {
+    let admin_client: AdminClient<_> = ClientConfig::new()
+        .set("bootstrap.servers", brokers)
+        .create()
+        .expect("AdminClient creation failed");
+
+    let new_topics: Vec<NewTopic> = topics
+        .iter()
+        .map(|t| NewTopic::new(t, 1, TopicReplication::Fixed(1)))
+        .collect();
+
+    let options = AdminOptions::new();
+    let results = admin_client
+        .create_topics(&new_topics, &options)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    for result in results {
+        match result {
+            Ok(topic) => println!("Topic created: {topic}"),
+            Err((topic, err)) => {
+                // Ignore if topic already exists
+                if err.to_string().contains("TopicAlreadyExists")
+                    || err.to_string().contains("already exists")
+                {
+                    println!("Topic already exists: {topic}");
+                } else {
+                    eprintln!("Error creating topic {topic}: {err}");
+                }
+            }
+        }
+    }
+
+    Ok(())
 }
 
 pub struct KafkaConsumer {

@@ -2,6 +2,7 @@ import { DataType, RuleAction } from "@molen/shared-types";
 export { DataType, RuleAction };
 
 export interface SchemaProperty {
+  id: string;
   key: string;
   type: DataType;
 }
@@ -23,7 +24,7 @@ export interface LogicBlock {
   id: string;
   variable: string; // e.g., "input.name" or "input"
   operator: string; // e.g., "starts_with", ">"
-  value: any;
+  value: unknown;
   variableType: DataType;
   connector?: LogicalOperator; // AND/OR to next block
 }
@@ -80,6 +81,10 @@ export const TypeOperators: Record<DataType, Array<{ value: string; label: strin
     { value: "exists", label: "Exists", syntax: "exists()" },
     { value: "is_null", label: "Is Null", syntax: "is_null()" },
   ],
+  [DataType.TIMESTAMP]: [],
+  [DataType.ARRAY]: [],
+  [DataType.GEO_COORDINATES]: [],
+  [DataType.ANOMALY_SCORE]: [],
 };
 
 // Built-in functions with syntax highlighting

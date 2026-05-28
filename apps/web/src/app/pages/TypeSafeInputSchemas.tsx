@@ -21,7 +21,7 @@ import { useCombinedAppState, useAddSchema, useUpdateSchema, useDeleteSchema } f
 import { toast } from "sonner";
 import { TypeSafeInputSchemaForm } from "../components/forms/TypeSafeInputSchemaForm";
 import { DataTypeBadge } from "../components/common/DataTypeBadge";
-import { InputSchema } from "../types/molen";
+import { InputSchema } from "@molen/shared-types";
 
 export function TypeSafeInputSchemas() {
   const state = useCombinedAppState();
@@ -33,12 +33,8 @@ export function TypeSafeInputSchemas() {
 
   const handleDelete = (id: string, name: string) => {
     deleteSchema.mutate(id, {
-      onSuccess: () => {
-        toast.success(`Deleted ${name}`);
-      },
-      onError: (err) => {
-        toast.error(`Failed to delete schema: ${err.message}`);
-      }
+      onSuccess: () => toast.success(`Deleted ${name}`),
+      onError: (err) => toast.error(`Failed to delete schema: ${err.message}`)
     });
   };
 
@@ -54,26 +50,22 @@ export function TypeSafeInputSchemas() {
 
   const handleSubmit = (data: InputSchema) => {
     if (editingSchema) {
-      updateSchema.mutate({ id: editingSchema.id, schema: data as any }, {
+      updateSchema.mutate({ id: editingSchema.id, schema: data }, {
         onSuccess: () => {
           toast.success(`Updated ${data.name}`);
           setDialogOpen(false);
           setEditingSchema(null);
         },
-        onError: (err) => {
-          toast.error(`Failed to update schema: ${err.message}`);
-        }
+        onError: (err) => toast.error(`Failed to update schema: ${err.message}`)
       });
     } else {
-      addSchema.mutate(data as any, {
+      addSchema.mutate(data, {
         onSuccess: () => {
           toast.success(`Created ${data.name}`);
           setDialogOpen(false);
           setEditingSchema(null);
         },
-        onError: (err) => {
-          toast.error(`Failed to create schema: ${err.message}`);
-        }
+        onError: (err) => toast.error(`Failed to create schema: ${err.message}`)
       });
     }
   };
@@ -82,80 +74,43 @@ export function TypeSafeInputSchemas() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="mb-2">Input Schema Registry</h1>
-          <p className="text-muted-foreground">
-            Define raw data structures with type-safe field definitions
-          </p>
+          <h1 className="text-2xl font-bold mb-2">Input Schema Registry</h1>
+          <p className="text-muted-foreground text-sm">Define raw data structures with type-safe field definitions</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90" onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Schema
-        </Button>
+        <Button className="bg-primary hover:bg-primary/90" onClick={handleCreate}><Plus className="mr-2 h-4 w-4" /> New Schema</Button>
       </div>
 
       <div className="rounded-lg border border-border/50 bg-card/50 backdrop-blur">
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-transparent border-border/50">
+            <TableRow className="hover:bg-transparent border-border/40">
               <TableHead>Name</TableHead>
               <TableHead>Version</TableHead>
               <TableHead>Fields</TableHead>
               <TableHead>Data Types</TableHead>
-              <TableHead>Last Updated</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {state.inputSchemas.map((schema) => {
-              const uniqueTypes = Array.from(
-                new Set(schema.fields.map((f) => f.dataType))
-              );
-
+            {(state.inputSchemas as InputSchema[]).map((schema) => {
+              const uniqueTypes = Array.from(new Set((schema.fields || []).map((f) => f.type)));
               return (
-                <TableRow
-                  key={schema.id}
-                  className="border-border/30 hover:bg-muted/30"
-                >
+                <TableRow key={schema.id} className="border-border/30 hover:bg-muted/30">
                   <TableCell className="font-medium">{schema.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {schema.version}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {schema.fields.length} fields
-                  </TableCell>
+                  <TableCell className="text-muted-foreground">{schema.version || "v1.0"}</TableCell>
+                  <TableCell className="text-muted-foreground">{(schema.fields || []).length} fields</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {uniqueTypes.slice(0, 3).map((type) => (
-                        <DataTypeBadge key={type} dataType={type} size="sm" />
-                      ))}
-                      {uniqueTypes.length > 3 && (
-                        <Badge variant="outline" className="border-border/50 text-xs">
-                          +{uniqueTypes.length - 3}
-                        </Badge>
-                      )}
+                      {uniqueTypes.slice(0, 3).map((type) => <DataTypeBadge key={type} dataType={type as DataType} size="sm" />)}
+                      {uniqueTypes.length > 3 && <Badge variant="outline" className="border-border/50 text-[10px]">+{uniqueTypes.length - 3}</Badge>}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {new Date(schema.updatedAt).toLocaleDateString()}
-                  </TableCell>
+                  <TableCell><Badge variant="outline" className="capitalize text-[10px]">{schema.status || 'active'}</Badge></TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 hover:bg-muted"
-                        onClick={() => handleEdit(schema)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 hover:bg-destructive/20 hover:text-destructive"
-                        onClick={() => handleDelete(schema.id, schema.name)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(schema)}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(schema.id, schema.name)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -166,22 +121,12 @@ export function TypeSafeInputSchemas() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-popover border-border/50 max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-popover border-border/50">
           <DialogHeader>
-            <DialogTitle>
-              {editingSchema ? "Edit Schema" : "New Schema"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingSchema
-                ? "Update the input schema configuration with type-safe fields"
-                : "Build your JSON schema visually with enforced data types"}
-            </DialogDescription>
+            <DialogTitle>{editingSchema ? "Edit Schema" : "New Schema"}</DialogTitle>
+            <DialogDescription>{editingSchema ? "Update the input schema configuration" : "Build your JSON schema visually"}</DialogDescription>
           </DialogHeader>
-          <TypeSafeInputSchemaForm
-            initialData={editingSchema || undefined}
-            onSubmit={handleSubmit}
-            onCancel={() => setDialogOpen(false)}
-          />
+          <TypeSafeInputSchemaForm initialData={editingSchema} onSubmit={handleSubmit} onCancel={() => setDialogOpen(false)} />
         </DialogContent>
       </Dialog>
     </div>

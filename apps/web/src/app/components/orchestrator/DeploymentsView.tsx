@@ -22,6 +22,15 @@ import { EnvironmentCard } from "./EnvironmentCard";
 import { DeploymentModal } from "./DeploymentModal";
 import { MoreVertical, Eye, Rocket, GitCommit, Calendar, User } from "lucide-react";
 
+interface EnhancedVersion {
+  id: string;
+  version: string | number;
+  commit_message?: string;
+  author?: string;
+  committed_at?: string;
+  environments?: string[];
+}
+
 export function DeploymentsView() {
   const { id } = useParams();
   const versionsQuery = useCommittedVersions(id!);
@@ -136,7 +145,7 @@ export function DeploymentsView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {versions.map((version: any) => (
+                {(versions as unknown as EnhancedVersion[]).map((version) => (
                   <TableRow
                     key={version.id}
                     className="border-border/30 hover:bg-muted/20 transition-colors"
@@ -164,7 +173,7 @@ export function DeploymentsView() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1.5">
                         {version.environments && Array.isArray(version.environments) && version.environments.length > 0 ? (
-                          version.environments.map((env: any) => (
+                          version.environments.map((env: string) => (
                             <Badge
                               key={env}
                               variant="outline"

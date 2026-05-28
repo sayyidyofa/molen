@@ -6,11 +6,11 @@
     "packages/*"
   ],
   "scripts": {
-    "infra:up": "docker compose up -d",
-    "infra:down": "docker compose down",
+    "infra:up": "docker compose -f docker-compose.infra.yml up -d",
+    "infra:down": "docker compose -f docker-compose.infra.yml down",
     "dev:api": "bun apps/api/src/index.ts",
     "dev:web": "cd apps/web && bun run dev",
-    "dev:engine": "cd apps/engine && cargo run",
+    "dev:engine": "export $(cat .env | xargs) && cd apps/engine && cargo run",
     "db:init": "bun apps/api/src/db-init.ts",
     "db:seed": "bun apps/api/src/seed.ts",
     "install:all": "bun install",
@@ -18,8 +18,5 @@
     "test:web": "cd apps/web && npx playwright test",
     "test:web:install": "cd apps/web && npx playwright install --with-deps chromium",
     "test:e2e": "npm run test:api && npm run test:web"
-  },
-  "devDependencies": {
-    "bun": "^1.3.14"
   }
 }
